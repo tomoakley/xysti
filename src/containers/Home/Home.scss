@@ -1,4 +1,3 @@
-@import "../../theme/variables.scss";
 
 .home {
   dd {
@@ -13,14 +12,11 @@
   .logo {
     $size: 200px;
     margin: auto;
-    height: $size;
-    width: $size;
-    border-radius: $size / 2;
-    border: 1px solid $cyan;
-    box-shadow: inset 0 0 10px $cyan;
+    border: 1px solid blue;
+    box-shadow: inset 0 0 10px blue;
     vertical-align: middle;
     p {
-      line-height: $size;
+      line-height: 1.5;
       margin: 0px;
     }
     img {
@@ -29,7 +25,7 @@
     }
   }
   h1 {
-    color: $cyan;
+    color: blue;
     font-size: 4em;
   }
   h2 {
@@ -44,9 +40,9 @@
     margin: 10px;
   }
   .humility {
-    color: $humility;
+    color: lightblue;
     a {
-      color: $humility;
+      color: lightblue;
     }
   }
   .github {

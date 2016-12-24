@@ -1,9 +1,11 @@
 import Express from 'express';
 import React from 'react';
+import {dispatch} from 'redux'
 import ReactDOM from 'react-dom/server';
 import config from './config';
 import favicon from 'serve-favicon';
 import compression from 'compression';
+import cookieParser from 'cookie-parser'
 import httpProxy from 'http-proxy';
 import path from 'path';
 import createStore from './redux/create';
@@ -11,6 +13,8 @@ import ApiClient from './helpers/ApiClient';
 import Html from './helpers/Html';
 import PrettyError from 'pretty-error';
 import http from 'http';
+import {verifyJwt} from './utils/jwt'
+import {getUserById} from './utils/AuthService'
 
 import { match } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
@@ -18,8 +22,9 @@ import { ReduxAsyncConnect, loadOnServer } from 'redux-async-connect';
 import createHistory from 'react-router/lib/createMemoryHistory';
 import {Provider} from 'react-redux';
 import getRoutes from './routes';
+import {fetchUserDetails} from 'redux/modules/user'
 
-const targetUrl = 'http://' + config.apiHost + ':' + config.apiPort;
+const targetUrl = `http://${config.apiHost}:${config.apiPort}`
 const pretty = new PrettyError();
 const app = new Express();
 const server = new http.Server(app);
@@ -30,7 +35,7 @@ const proxy = httpProxy.createProxyServer({
 
 app.use(compression());
 app.use(favicon(path.join(__dirname, '..', 'static', 'favicon.ico')));
-
+app.use(cookieParser())
 app.use(Express.static(path.join(__dirname, '..', 'static')));
 
 // Proxy to API server
@@ -59,6 +64,12 @@ proxy.on('error', (error, req, res) => {
   json = {error: 'proxy_error', reason: error.message};
   res.end(JSON.stringify(json));
 });
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+  next()
+})
 
 app.use((req, res) => {
   if (__DEVELOPMENT__) {

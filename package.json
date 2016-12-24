@@ -1,14 +1,14 @@
 {
-  "name": "react-redux-universal-hot-example",
-  "description": "Example of an isomorphic (universal) webapp using react redux and hot reloading",
-  "author": "Erik Rasmussen <rasmussenerik@gmail.com> (http://github.com/erikras)",
+  "name": "Xysti",
+  "description": "On-demand sports app front-end and server",
+  "author": "Tom Oakley",
   "license": "MIT",
   "version": "0.9.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/erikras/react-redux-universal-hot-example"
+    "url": "https://github.com/tomoakley/xysti"
   },
-  "homepage": "https://github.com/erikras/react-redux-universal-hot-example",
+  "homepage": "https://github.com/tomoakley/xysti",
   "keywords": [
     "react",
     "isomorphic",
@@ -22,7 +22,7 @@
     "boilerplate",
     "babel"
   ],
-  "main": "bin/server.js",
+  "main": "bin/client.js",
   "scripts": {
     "start": "concurrent --kill-others \"npm run start-prod\" \"npm run start-prod-api\"",
     "start-prod": "better-npm-run start-prod",
@@ -33,14 +33,14 @@
     "start-dev": "better-npm-run start-dev",
     "start-dev-api": "better-npm-run start-dev-api",
     "watch-client": "better-npm-run watch-client",
-    "dev": "concurrent --kill-others \"npm run watch-client\" \"npm run start-dev\" \"npm run start-dev-api\"",
+    "dev": "cross-env NODE_ENV=development concurrent --kill-others \"npm run watch-client\" \"npm run start-dev\" \"npm run start-dev-api\"",
     "test": "karma start",
     "test-node": "./node_modules/mocha/bin/mocha $(find api -name '*-test.js') --compilers js:babel-core/register",
     "test-node-watch": "./node_modules/mocha/bin/mocha $(find api -name '*-test.js') --compilers js:babel-core/register --watch"
   },
   "betterScripts": {
     "start-prod": {
-      "command": "node ./bin/server.js",
+      "command": "node ./bin/client.js",
       "env": {
         "NODE_PATH": "./src",
         "NODE_ENV": "production",
@@ -57,7 +57,7 @@
       }
     },
     "start-dev": {
-      "command": "node ./bin/server.js",
+      "command": "node ./bin/client.js",
       "env": {
         "NODE_PATH": "./src",
         "NODE_ENV": "development",
@@ -68,7 +68,7 @@
     "start-dev-api": {
       "command": "node ./bin/api.js",
       "env": {
-        "NODE_PATH": "./api",
+        "NODE_PATH": "./server",
         "NODE_ENV": "development",
         "APIPORT": 3030
       }
@@ -105,19 +105,32 @@
     "babel-runtime": "^6.3.19",
     "body-parser": "^1.14.1",
     "compression": "^1.6.0",
+    "cookie-parser": "^1.4.3",
+    "cross-env": "^3.1.3",
+    "dotenv": "^2.0.0",
+    "es6-promise": "^4.0.5",
     "express": "^4.13.3",
     "express-session": "^1.12.1",
     "file-loader": "^0.8.5",
+    "fs": "0.0.1-security",
     "hoist-non-react-statics": "^1.0.3",
     "http-proxy": "^1.12.0",
     "invariant": "^2.2.0",
+    "isomorphic-fetch": "^2.2.1",
+    "js-cookie": "^2.1.3",
+    "jsonwebtoken": "^7.1.9",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
     "lru-memoize": "^1.0.0",
     "map-props": "^1.0.0",
     "multireducer": "^2.0.0",
+    "node-fetch": "^1.6.3",
+    "pg": "^6.1.0",
+    "pg-hstore": "^2.3.2",
+    "pg-native": "^1.10.0",
     "piping": "^0.3.0",
     "pretty-error": "^1.2.0",
+    "ramda": "^0.22.1",
     "react": "^0.14.2",
     "react-bootstrap": "^0.28.1",
     "react-dom": "^0.14.1",
@@ -130,7 +143,9 @@
     "redux": "^3.0.4",
     "redux-async-connect": "^1.0.0-rc2",
     "redux-form": "^3.0.12",
+    "redux-thunk": "^2.1.0",
     "scroll-behavior": "^0.3.2",
+    "sequelize": "^3.27.0",
     "serialize-javascript": "^1.1.2",
     "serve-favicon": "^2.3.0",
     "socket.io": "^1.3.7",
@@ -138,7 +153,8 @@
     "superagent": "^1.4.0",
     "url-loader": "^0.5.7",
     "warning": "^2.1.0",
-    "webpack-isomorphic-tools": "^2.2.18"
+    "webpack-isomorphic-tools": "^2.2.18",
+    "xhr2": "^0.1.3"
   },
   "devDependencies": {
     "autoprefixer-loader": "^3.1.0",
