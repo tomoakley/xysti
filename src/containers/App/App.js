@@ -4,6 +4,7 @@ import {pick} from 'ramda'
 import Helmet from 'react-helmet'
 import config from '../../config'
 import {reauthenticate} from '../../utils/AuthService'
+import Header from 'components/Header/Header'
 import {fetchUserDetails} from 'redux/modules/user'
 import FETCH_STATES from 'utils/redux/FETCH_STATES'
 
@@ -22,26 +23,22 @@ export default connect(
     }
 
     componentWillMount() {
-      const {fetchState} = this.props.user
+      const {
+        user: {fetchState},
+      } = this.props
       if (fetchState === FETCH_STATES.INIT) reauthenticate().then(data => this.props.fetchUserDetails(data))
     }
 
     render() {
-      const {
-        user: {name, picture, auth}
-      } = this.props
+      const {user} = this.props
       const styles = require('./App.scss')
-
       return (
         <div className={styles.app}>
           <Helmet {...config.app.head}/>
-          {auth ? <img src={picture} style={{width: '75px', display: 'inline-block', borderRadius: '100%'}} /> : null}
-          <h1 style={{display: 'inline-block'}}>Hey {name}!</h1>
-
+          <Header user={user} />
           <div className={styles.appContent}>
             {this.props.children}
           </div>
-
         </div>
       )
     }

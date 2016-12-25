@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
-import {login, logout, facebookAuth} from 'utils/AuthService'
+import {Link} from 'react-router'
+import {login, logout} from 'utils/AuthService'
 
 export default class Login extends Component {
 
@@ -44,7 +45,7 @@ export default class Login extends Component {
   }
 
   renderLoggedInMessage() {
-    return <p>You're already logged in! You can <a href="#" onClick={this.onLogoutClick}>logout</a> if you want. Or <a href={facebookAuth()}>connect your account to Facebook</a>.</p>
+    return <p>You're already logged in! You can <a href="#" onClick={this.onLogoutClick}>logout</a> if you want. Or <Link to="/profile">go to your profile</Link>.</p>
   }
 
   render() {

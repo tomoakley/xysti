@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux'
 import {pick} from 'ramda'
-import Helmet from 'react-helmet';
+import Helmet from 'react-helmet'
 import LoginForm from 'components/LoginForm/LoginForm'
 import {fetchUserDetails, removeUserDetails} from 'redux/modules/user'
 
@@ -29,4 +29,4 @@ export default connect(
       );
     }
   }
- )
+)

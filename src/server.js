@@ -1,4 +1,5 @@
 import Express from 'express';
+import session from 'express-session'
 import React from 'react';
 import {dispatch} from 'redux'
 import ReactDOM from 'react-dom/server';
@@ -37,6 +38,17 @@ app.use(compression());
 app.use(favicon(path.join(__dirname, '..', 'static', 'favicon.ico')));
 app.use(cookieParser())
 app.use(Express.static(path.join(__dirname, '..', 'static')));
+
+app.use(session({
+  secret: "keyboardcat",
+  name: "mycookie",
+  resave: true,
+  saveUninitialized: true,
+  cookie: { 
+      secure: false,
+      maxAge: 6000000
+  }
+}))
 
 // Proxy to API server
 app.use('/api', (req, res) => {
