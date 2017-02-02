@@ -5,6 +5,7 @@ import http from 'http'
 import SocketIo from 'socket.io'
 import config from '../src/config'
 import {authorize, login} from './actions/User'
+import {create} from './actions/Session'
 
 const app = express()
 const server = new http.Server(app)
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
 
 app.post('/user/login', login)
 app.post('/user/authorize', authorize)
+app.post('/session/create', create)
 
 if (apiPort) {
   const runnable = app.listen(apiPort, (err) => {

@@ -6,9 +6,12 @@ logs
 *.log
 npm-debug.log*
 
-Vim files
+# Vim files
 *.swp
 *.swo
+
+# OS X files
+.DS_Store
 
 # Runtime data
 pids

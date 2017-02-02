@@ -14,6 +14,8 @@ module.exports = Object.assign({
   port: process.env.PORT,
   apiHost: process.env.APIHOST || 'localhost',
   apiPort: process.env.APIPORT,
+  botHost: process.env.BOTHOST || 'localhost',
+  botPort: process.env.BOTPORT,
   app: {
     title: 'Xysti',
     description: 'On-demand sports and physical activity app',
