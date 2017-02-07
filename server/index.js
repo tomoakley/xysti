@@ -3,9 +3,11 @@ import session from 'express-session'
 import bodyParser from 'body-parser'
 import http from 'http'
 import SocketIo from 'socket.io'
+const RedisStore = require('connect-redis')(session)
 import config from '../src/config'
-import {authorize, login} from './actions/User'
+import {authorize, login, linkAccount, auth0ManagementApiJwt} from './actions/User'
 import {create} from './actions/Session'
+import configureAuth from './configureAuth'
 
 const app = express()
 const server = new http.Server(app)
@@ -17,21 +19,29 @@ const {apiPort, apiHost} = config
 
 app.use(session({
   secret: 'react and redux',
-  resave: false,
-  saveUnitialized: false,
-  cookie: { maxAge: 6000 }
+  resave: true,
+  saveUnitialized: true,
+  secure: false,
+  store: new RedisStore({host: 'localhost', port: 6379})
 }))
 app.use(bodyParser.json())
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+  res.header("Access-Control-Allow-Origin", 'http://localhost:3000')
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, X-AUTHENTICATION, X-IP, Content-Type, Accept")
+  res.header('Access-Control-Allow-Credentials', true)
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
   next()
 })
 
-app.post('/user/login', login)
+configureAuth(app, config)
+
 app.post('/user/authorize', authorize)
+app.post('/user/link', linkAccount)
 app.post('/session/create', create)
+app.get('/jwt', (req, res) => {
+  res.json(auth0ManagementApiJwt(['read', 'update']))
+})
 
 if (apiPort) {
   const runnable = app.listen(apiPort, (err) => {

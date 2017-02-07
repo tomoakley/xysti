@@ -2,7 +2,7 @@ import 'es6-promise'
 import 'isomorphic-fetch'
 import {setCookieValue, removeCookie, getCookieValue} from './cookies.js'
 import urlFormat from './urlFormat'
-import {generateJwt, decodeJwt} from './jwt'
+import {generateJwt, decodeJwt, isJwtExpired} from './jwt'
 import config from '../config'
 
 export const getProfile = idToken => {
@@ -42,7 +42,7 @@ export const getUserById = id => {
     }
   }
 
-  generateJwt(
+  return generateJwt(
     AUTHO_MANAGEMENT_API_PAYLOAD,
     process.env.AUTH0_MANAGEMENT_API_SECRET,
     true,
@@ -54,7 +54,6 @@ export const getUserById = id => {
           'Authorization': `Bearer ${token}`
         }
       }).then(response => response.json())
-      .then(json => console.log(json))
     }
   )
 }
@@ -72,19 +71,6 @@ export const getUserById = id => {
   })
 } */
 
-export const facebookAuth = () => {
-  const {AUTH0_DOMAIN, AUTH0_CLIENT_ID} = process.env
-  const urlParams = {
-    pathname: `${AUTH0_DOMAIN}/authorize`,
-    query: {
-      response_type: 'code',
-      connection: 'facebook',
-      redirect_url: 'http://localhost:3000/login',
-      client_id: AUTH0_CLIENT_ID,
-    }
-  }
-  return urlFormat(urlParams)
-}
 
 export const reauthenticate = () => {
   return getCookieValue('id_token').then(idToken => {
@@ -110,28 +96,9 @@ export const reauthenticate = () => {
   }).catch(error => console.log(`Cookie error: ${error}`))
 }
 
-export const login = (params, err) => {
-  if (err) return err
-  const {email, password} = params
-  const {apiHost, apiPort} = config
-  return fetch(`http://${apiHost}:${apiPort}/user/login`, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      email: email,
-      password: password
-    })
-  })
-  .then(response => response.json())
-  .then(json => {
-    const {token: id_token, user_id, emailAddress, picture, name} = json
-    setCookieValue('id_token', id_token)
-    return {id_token, user_id, emailAddress, picture, name}
-  })
-  .catch(error => console.log(`ERROR: ${error}`))
+export const isLoggedIn = () => {
+  const token = window.localStorage.getItem('id_token')
+  return !!token && !isJwtExpired(token)
 }
 
 export const logout = () => {

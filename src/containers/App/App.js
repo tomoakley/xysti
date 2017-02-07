@@ -22,9 +22,9 @@ export default connect(
       store: PropTypes.object.isRequired
     }
 
-    componentWillMount() {
+    componentDidMount() {
       const {
-        user: {fetchState},
+        user: {fetchState}
       } = this.props
       if (fetchState === FETCH_STATES.INIT) reauthenticate().then(data => this.props.fetchUserDetails(data))
     }

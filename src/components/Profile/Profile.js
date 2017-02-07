@@ -9,7 +9,13 @@ export default class ProfilePage extends Component {
 
   render() {
     const {user} = this.props
-    return <p>Hi, {user.email}. <button onClick={this.props.logout}>Logout?</button></p>
+    return (
+      <p>
+        Hi, {user.email}.
+        <button onClick={this.props.logout}>Logout?</button>
+        <a href="http://localhost:3030/user/link/facebook">Connect to facebook</a>
+      </p>
+    )
   }
 
 }

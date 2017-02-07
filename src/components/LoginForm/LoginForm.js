@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
+import 'isomorphic-fetch'
 import {Link} from 'react-router'
-import {login, logout} from 'utils/AuthService'
+import {logout} from 'utils/AuthService'
 
 export default class Login extends Component {
 
@@ -20,12 +21,21 @@ export default class Login extends Component {
 
   onLoginSubmit(event) {
     event.preventDefault()
-    login({
-      email: this._email.value,
-      password: this._password.value
-    }).then(json => {
-      this.props.fetchUserDetails(json)
+    fetch('http://localhost:3030/login', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: this._email.value,
+        password: this._password.value
+      }),
+      credentials: 'include'
     })
+    .then(response => response.json())
+    .then(data => this.props.fetchUserDetails(data))
+    .catch(err => console.log(`ERROR: ${err}`))
   }
 
   onLogoutClick(event) {
@@ -50,7 +60,7 @@ export default class Login extends Component {
 
   render() {
     const {user} = this.props
-    return user.auth ? this.renderLoggedInMessage() : this.renderForm()
+    return user.id ? this.renderLoggedInMessage() : this.renderForm()
   }
 
 }

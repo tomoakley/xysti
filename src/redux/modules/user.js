@@ -8,7 +8,6 @@ const REMOVE_USER_DETAILS_FAILURE = 'xysti/user/REMOVE_USER_DETAILS_FAILURE'
 
 const initialState = {
   fetchState: FETCH_STATES.INIT,
-  auth: null,
   id: null,
   email: null,
   name: null,
@@ -20,7 +19,6 @@ const actionHandlers = {
   [FETCH_USER_DETAILS]: function setUserDetailsActionHandler() {
     return {
       fetchState: FETCH_STATES.IS_FETCHING,
-      auth: null,
       id: null,
       email: null,
       name: null,
@@ -28,10 +26,9 @@ const actionHandlers = {
       error: null
     }
   },
-  [FETCH_USER_DETAILS_SUCCESS]: function setUserDetailsSuccessActionHandler({auth, id, email, name, picture}) {
+  [FETCH_USER_DETAILS_SUCCESS]: function setUserDetailsSuccessActionHandler({id, email, name, picture}) {
     return {
       fetchState: FETCH_STATES.FETCH_SUCCESSFUL,
-      auth,
       id,
       email,
       name,
@@ -42,7 +39,6 @@ const actionHandlers = {
   [FETCH_USER_DETAILS_FAILURE]: function setUserDetailsFailureActionHandler({error}) {
     return {
       fetchState: FETCH_STATES.FETCH_FAILED,
-      auth: null,
       id: null,
       email: null,
       name: null,
@@ -54,7 +50,6 @@ const actionHandlers = {
   [REMOVE_USER_DETAILS_SUCCESS]: function removeUserDetailsSuccessActionHandler() {
     return {
       fetchState: FETCH_STATES.FETCH_INIT,
-      auth: null,
       id: null,
       email: null,
       name: null,
@@ -81,10 +76,9 @@ function requestUserDetails() {
   }
 }
 
-function receiveUserDetailsSuccess({id_token: auth, user_id: id, emailAddress: email, name, picture}) {
+function receiveUserDetailsSuccess({user_id: id, email, name, picture}) {
   return {
     type: FETCH_USER_DETAILS_SUCCESS,
-    auth,
     id,
     email,
     name,

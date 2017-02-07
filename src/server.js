@@ -1,5 +1,4 @@
 import Express from 'express';
-import session from 'express-session'
 import React from 'react';
 import {dispatch} from 'redux'
 import ReactDOM from 'react-dom/server';
@@ -14,16 +13,14 @@ import ApiClient from './helpers/ApiClient';
 import Html from './helpers/Html';
 import PrettyError from 'pretty-error';
 import http from 'http';
-import {verifyJwt} from './utils/jwt'
-import {getUserById} from './utils/AuthService'
-
+import passport from 'passport'
+import FacebookStrategy from 'passport-facebook'
 import { match } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import { ReduxAsyncConnect, loadOnServer } from 'redux-async-connect';
 import createHistory from 'react-router/lib/createMemoryHistory';
 import {Provider} from 'react-redux';
 import getRoutes from './routes';
-import {fetchUserDetails} from 'redux/modules/user'
 
 const targetUrl = `http://${config.apiHost}:${config.apiPort}`
 const pretty = new PrettyError();
@@ -39,17 +36,6 @@ app.use(favicon(path.join(__dirname, '..', 'static', 'favicon.ico')));
 app.use(cookieParser())
 app.use(Express.static(path.join(__dirname, '..', 'static')));
 
-app.use(session({
-  secret: "keyboardcat",
-  name: "mycookie",
-  resave: true,
-  saveUninitialized: true,
-  cookie: { 
-      secure: false,
-      maxAge: 6000000
-  }
-}))
-
 // Proxy to API server
 app.use('/api', (req, res) => {
   proxy.web(req, res, {target: targetUrl});
@@ -62,6 +48,34 @@ app.use('/ws', (req, res) => {
 server.on('upgrade', (req, socket, head) => {
   proxy.ws(req, socket, head);
 });
+
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: 'http://localhost:3000/user/link/facebook/return'
+  }, (accessToken, refreshToken, profile, cb) => {
+    fetch(`http://${config.apiHost}:${config.apiPort}/user/link`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json' 
+      },
+      body: JSON.stringify({
+        provider: 'facebook',
+        provider_id: profile.id,
+      })
+    })
+    cb(null, profile)
+  }
+))
+
+
+app.get('/user/link/facebook', passport.authenticate('facebook'))
+app.get('/user/link/facebook/return', passport.authenticate('facebook', 
+  { failureRedirect: '/login' }),
+  (req, res) => res.redirect('/profile')
+)
 
 // added the error handling to avoid https://github.com/nodejitsu/node-http-proxy/issues/527
 proxy.on('error', (error, req, res) => {
@@ -82,6 +96,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
   next()
 })
+
 
 app.use((req, res) => {
   if (__DEVELOPMENT__) {
