@@ -5,7 +5,13 @@ import {verifyJwt, generateJwt} from '../../src/utils/jwt'
 import {setCookieValue} from '../../src/utils/cookies'
 import urlFormat from '../../src/utils/urlFormat'
 
-export const getRefreshToken = (id, refreshToken) => {
+/* getRefreshToken
+ * Add the refresh token for the specified user into the database
+ * Params: id - the main user id
+ *         refreshToken - RF for the user id above
+ * TODO This shouldn't be exported by configureAuth currently processes inline so needs it
+ */
+export const addRefreshToken = (id, refreshToken) => {
   User.sync().then(() => {
     return User.findOrCreate({
       where: { user_id: id },
@@ -14,6 +20,11 @@ export const getRefreshToken = (id, refreshToken) => {
   })
 }
 
+/* addFacebookID
+ * Adds the facebook ID for the specified user into the database
+ * Params: id - the main user id
+ *         facebookId - FB id for the user above
+ */
 export const addFacebookID = (userId, facebookId) => {
   User.sync().then(() => {
     User.update(
@@ -25,6 +36,23 @@ export const addFacebookID = (userId, facebookId) => {
   })
 }
 
+/* findUserByFacebookID
+ * Given the facebook ID, return the main user ID
+ * TODO potentially add a [fields] param so more fields can be returned
+ */
+export const findUserByFacebookID = (facebookId) => {
+  return User.findOne({
+    where: { facebook_id: facebookId } 
+  }).then(user => {
+    user = user.get({plain:true})
+    return user.user_id 
+  }).catch(err => console.log(`Error finding User ID for ${facebook_id}: ${err}`))
+}
+
+/* login
+ * Validates the supplied username and password with Auth0 and returns the user details
+ * TODO currently unused because configureAuth is doing it inline
+ */
 export const login = async (username, password) => {
   const {AUTH0_CLIENT_ID, AUTH0_DOMAIN, AUTH0_SECRET} = process.env
   try {
@@ -59,9 +87,13 @@ export const login = async (username, password) => {
   } catch (err) {
     console.log(`FETCH ERROR: ${err}`) 
     return {err}
-  } 
+  }
 }
 
+/* authorize
+ * Authorizes a previously signed in user using the refresh token from the database
+ * TODO Needs refactoring as very ineffecient
+ */
 export const authorize = (req, res) => {
   const {id} = req.body
   const {AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_SECRET} = process.env
@@ -88,21 +120,25 @@ export const authorize = (req, res) => {
         const {sub: user_id, email: emailAddress, picture, name, exp, iat, aud} = decoded
         generateJwt({user_id, exp, iat, aud}, AUTH0_SECRET, true, (err, token) => {
           if (err) console.log(err)
-          else {
-            req.session.user_id = user_id
-            req.session.save()
-            res.json({token, user_id, emailAddress, picture, name})
-          }
+          else res.json({token, user_id, emailAddress, picture, name})
         })
       })
     }).catch(err => res.json(`Delegation error: ${err}`))
   }).catch(error => console.log(`Sequelize error: ${error}`))
 }
 
+/* linkAccount
+ * Link an account to a provider using Auth0
+ * TODO currently configureAuth does this inline
+ */
 export const linkAccount = (req, res) => {
   console.log('session', req.session)
 }
 
+/* auth0ManagementApiJwt
+ * Return a JWT which can be used to access the Auth0 Management API
+ * Params: scopes - array containing scopes for the API. e.g ['read', 'update']
+ */
 export const auth0ManagementApiJwt = (scopes) => {
   const {AUTH0_MANAGEMENT_API_KEY, AUTH0_MANAGEMENT_API_SECRET} = process.env
   const AUTH0_MANAGEMENT_API_PAYLOAD = {
@@ -127,17 +163,18 @@ export const auth0ManagementApiJwt = (scopes) => {
   )
 }
 
+/* getUserById
+ * Return user details for supplied id
+ * TODO Refactor so 'fields' is a param and can be changed depending on user needs
+ */
 export const getUserById = id => {
-  
   const urlParams = {
     pathname: `https://${process.env.AUTH0_DOMAIN}/api/v2/users/${id}`,
     query: {
       fields: 'user_id,email,picture,name,identities'
     }
   }
-
   const token = auth0ManagementApiJwt(['read'])
-
   return fetch(urlFormat(urlParams), {
     headers: {
       'Accept': 'application/json',

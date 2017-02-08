@@ -40,7 +40,6 @@ const getEntities = (entities) => {
 
 bot.dialog('/collectEntities', [
   (session, args) => {
-    console.log('args', args)
     const {missingEntities} = args
     session.dialogData.entities = args.entities
     session.dialogData.missingEntities = missingEntities
@@ -55,9 +54,8 @@ bot.dialog('/collectEntities', [
   }
 ])
 
-intents.matches('book.session', [
+intents.matches('session.query', [
   (session, args) => {
-    console.log('entities', args)
     const sport = EntityRecognizer.findEntity(args.entities, 'sport')
     const location = EntityRecognizer.findEntity(args.entities, 'geo-city')
     const date = EntityRecognizer.findEntity(args.entities, 'date')
@@ -77,12 +75,11 @@ bot.dialog('/findSession', [
   (session, args) => {
     const {sport, location, date, time} = args
     const datetime = parseDateTime(date.value, time.value)
-    console.log(JSON.stringify({
-      sport: sport.value,
-      location: location.value,
-      datetime: datetime.from 
-    }))
-    fetch(`http://${config.apiHost}:${config.apiPort}/session/create`, {
+    const addDetailsToSession = (session, details, facebookId) => {
+      session.dialogData.sessionDetails = {...details, facebookId}
+      return session 
+    }
+    fetch(`http://${config.apiHost}:${config.apiPort}/session/find`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -103,9 +100,28 @@ bot.dialog('/findSession', [
             .images([
                 builder.CardImage.create(session, 'http://cache2.asset-cache.net/xt/467826952.jpg?v=1&g=fs2|0|editorial186|26|952&s=1&b=NA==')
             ])
-            .tap(builder.CardAction.openUrl(session, "https://en.wikipedia.org/wiki/Space_Needle"))
+            .buttons([builder.CardAction.postBack(addDetailsToSession(session, {...data}, '10205942258634763'), 'Book this session', "Book this session")]) // TODO facebookId needs to be obtained from session data
         ]);
-        session.send(msg); 
+        builder.Prompts.text(session, msg)
     }).catch(err => console.log(`ERROR: ${err}`))
-  }
+  },
+  (session, args) => session.replaceDialog('/bookSession', session.dialogData)
+])
+
+bot.dialog('/bookSession', [
+  (session, results) => {
+    const {sessionDetails} = results
+    const {apiHost, apiPort} = config
+    fetch(`http://${apiHost}:${apiPort}/session/book`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({...sessionDetails})
+    }).then(response => response.json())
+      .then(session => console.log('session', session))
+      .catch(err => console.log(`Error booking session on chatbot: ${err}`))
+    session.send('Session booked')
+  } 
 ])
