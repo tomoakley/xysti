@@ -2,14 +2,19 @@ import express from 'express'
 import config from '../config'
 import {connector} from './bot'
 
-const app = express()
 const {
   bot: {
     port: botPort,
     host: botHost 
   },
-  api: {port: apiPort}
+  api: {
+    port: apiPort,
+    host: apiHost
+  }
 } = config
+
+const app = express()
+
 app.post('/api/messages', connector.listen())
 app.listen(botPort, (err) => {
   if (err) console.error(`Server Error: ${err}`)

@@ -4,6 +4,13 @@ import apiAiRecognizer from 'api-ai-recognizer'
 import config from '../config'
 import parseDateTime from './utils/datetime/parse'
 
+const {
+  api: {
+    port: apiPort,
+    host: apiHost
+  }
+} = config
+
 export const connector = new ChatConnector({
   appId: process.env.MICROSOFT_BOT_FRAMEWORK_ID,
   appPassword: process.env.MICROSOFT_BOT_FRAMEWORK_SECRET
@@ -79,7 +86,7 @@ bot.dialog('/findSession', [
       session.dialogData.sessionDetails = {...details, facebookId}
       return session 
     }
-    fetch(`http://${config.apiHost}:${config.apiPort}/session/find`, {
+    fetch(`http://${apiHost}:${apiPort}/session/find`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -111,7 +118,6 @@ bot.dialog('/findSession', [
 bot.dialog('/bookSession', [
   (session, results) => {
     const {sessionDetails} = results
-    const {apiHost, apiPort} = config
     fetch(`http://${apiHost}:${apiPort}/session/book`, {
       method: 'POST',
       headers: {
