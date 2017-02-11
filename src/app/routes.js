@@ -1,6 +1,6 @@
 import React from 'react'
 import {IndexRoute, Route} from 'react-router'
-import {App, Home, Login, NotFound, Profile} from 'containers'
+import {App, Home, Login, NotFound, Profile} from 'app/containers'
 
 export default () => {
   return (

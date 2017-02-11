@@ -3,7 +3,7 @@ import createMiddleware from './middleware/clientMiddleware';
 import { routerMiddleware } from 'react-router-redux';
 import thunk from 'redux-thunk'
 
-export default function createStore(history, client, data) {
+export default function createStore({config}, history, client, data) {
   // Sync dispatched route actions to the history
   const reduxRouterMiddleware = routerMiddleware(history);
 
@@ -22,7 +22,7 @@ export default function createStore(history, client, data) {
     finalCreateStore = applyMiddleware(...middleware)(_createStore);
   }
 
-  const reducer = require('./modules/reducer');
+  const reducer = require('./modules/reducer')({config});
   const store = finalCreateStore(reducer, data);
 
 

@@ -2,7 +2,7 @@ import Express from 'express';
 import React from 'react';
 import {dispatch} from 'redux'
 import ReactDOM from 'react-dom/server';
-import config from './config';
+import config from '../config';
 import favicon from 'serve-favicon';
 import compression from 'compression';
 import cookieParser from 'cookie-parser'
@@ -32,9 +32,9 @@ const proxy = httpProxy.createProxyServer({
 });
 
 app.use(compression());
-app.use(favicon(path.join(__dirname, '..', 'static', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, '..', '..', 'static', 'favicon.ico')));
 app.use(cookieParser())
-app.use(Express.static(path.join(__dirname, '..', 'static')));
+app.use(Express.static(path.join(__dirname, '..', '..', 'static')));
 
 // Proxy to API server
 app.use('/api', (req, res) => {
@@ -48,34 +48,6 @@ app.use('/ws', (req, res) => {
 server.on('upgrade', (req, socket, head) => {
   proxy.ws(req, socket, head);
 });
-
-passport.use(new FacebookStrategy({
-    clientID: process.env.FACEBOOK_APP_ID,
-    clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: 'http://localhost:3000/user/link/facebook/return'
-  }, (accessToken, refreshToken, profile, cb) => {
-    fetch(`http://${config.apiHost}:${config.apiPort}/user/link`, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json' 
-      },
-      body: JSON.stringify({
-        provider: 'facebook',
-        provider_id: profile.id,
-      })
-    })
-    cb(null, profile)
-  }
-))
-
-
-app.get('/user/link/facebook', passport.authenticate('facebook'))
-app.get('/user/link/facebook/return', passport.authenticate('facebook', 
-  { failureRedirect: '/login' }),
-  (req, res) => res.redirect('/profile')
-)
 
 // added the error handling to avoid https://github.com/nodejitsu/node-http-proxy/issues/527
 proxy.on('error', (error, req, res) => {
@@ -106,7 +78,7 @@ app.use((req, res) => {
   }
   const client = new ApiClient(req);
   const memoryHistory = createHistory(req.originalUrl);
-  const store = createStore(memoryHistory, client);
+  const store = createStore({config}, memoryHistory, client);
   const history = syncHistoryWithStore(memoryHistory, store);
 
   function hydrateOnClient() {

@@ -1,31 +1,31 @@
 {
   "javascript": {
-    "main": "http://localhost:3001/dist/main-930265b69442c0aa6972.js"
+    "main": "http://localhost:3001/dist/main-bd66689837020bca015c.js"
   },
   "styles": {},
   "assets": {
-    "./src/components/Header/header.scss": {
-      "siteHeader": "siteHeader___1wK6V",
-      "headerLogo": "headerLogo___ko7Ub",
-      "headerUser": "headerUser___2X2u6",
-      "headerUser__picture": "headerUser__picture___3DeQJ",
-      "_style": ".siteHeader___1wK6V {\n  background: #eee;\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: justify;\n      justify-content: space-between;\n  -ms-flex-align: center;\n      align-items: center;\n  padding: 0 20px;\n}\n\n.headerLogo___ko7Ub {\n  font-weight: bold;\n  font-size: 24px;\n  font-size: 2.4rem;\n  color: #444;\n  text-decoration: none;\n}\n\n.headerUser___2X2u6 {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-align: center;\n      align-items: center;\n  text-decoration: none;\n  padding: 10px;\n  color: #444;\n  transition: all 0.2s ease;\n}\n\n.headerUser___2X2u6:hover {\n  color: white;\n  background: #49E273;\n}\n\n.headerUser___2X2u6:hover .headerUser__picture___3DeQJ {\n  border-color: white;\n}\n\n.headerUser___2X2u6 .headerUser__picture___3DeQJ {\n  width: 48px;\n  margin-right: 10px;\n  border-radius: 100%;\n  border: solid transparent 3px;\n}\n"
+    "./src/app/components/Header/header.scss": {
+      "siteHeader": "siteHeader___3lCAa",
+      "headerLogo": "headerLogo___J-4qQ",
+      "headerUser": "headerUser___U06LY",
+      "headerUser__picture": "headerUser__picture___26zsF",
+      "_style": ".siteHeader___3lCAa {\n  background: #eee;\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: justify;\n      justify-content: space-between;\n  -ms-flex-align: center;\n      align-items: center;\n  padding: 0 20px;\n}\n\n.headerLogo___J-4qQ {\n  font-weight: bold;\n  font-size: 24px;\n  font-size: 2.4rem;\n  color: #444;\n  text-decoration: none;\n}\n\n.headerUser___U06LY {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-align: center;\n      align-items: center;\n  text-decoration: none;\n  padding: 10px;\n  color: #444;\n  transition: all 0.2s ease;\n}\n\n.headerUser___U06LY:hover {\n  color: white;\n  background: #49E273;\n}\n\n.headerUser___U06LY:hover .headerUser__picture___26zsF {\n  border-color: white;\n}\n\n.headerUser___U06LY .headerUser__picture___26zsF {\n  width: 48px;\n  margin-right: 10px;\n  border-radius: 100%;\n  border: solid transparent 3px;\n}\n"
     },
-    "./src/containers/App/App.scss": {
+    "./src/app/containers/App/App.scss": {
       "_style": "html {\n  font-size: 62.5%;\n}\n\nbody {\n  margin: 0;\n  font-family: sans-serif;\n  font-size: 16px;\n  font-size: 1.6rem;\n}\n"
     },
-    "./src/containers/Home/Home.scss": {
-      "home": "home___1bkob",
-      "masthead": "masthead___3qL9t",
-      "logo": "logo___1_SL2",
-      "humility": "humility___Bedqz",
-      "github": "github___qJ_u3",
-      "counterContainer": "counterContainer___Jx2OO",
-      "_style": ".home___1bkob dd {\n  margin-bottom: 15px;\n}\n\n.masthead___3qL9t {\n  background: #2d2d2d;\n  padding: 40px 20px;\n  color: white;\n  text-align: center;\n}\n\n.masthead___3qL9t .logo___1_SL2 {\n  margin: auto;\n  border: 1px solid blue;\n  box-shadow: inset 0 0 10px blue;\n  vertical-align: middle;\n}\n\n.masthead___3qL9t .logo___1_SL2 p {\n  line-height: 1.5;\n  margin: 0px;\n}\n\n.masthead___3qL9t .logo___1_SL2 img {\n  width: 75%;\n  margin: auto;\n}\n\n.masthead___3qL9t h1 {\n  color: blue;\n  font-size: 4em;\n}\n\n.masthead___3qL9t h2 {\n  color: #ddd;\n  font-size: 2em;\n  margin: 20px;\n}\n\n.masthead___3qL9t a {\n  color: #ddd;\n}\n\n.masthead___3qL9t p {\n  margin: 10px;\n}\n\n.masthead___3qL9t .humility___Bedqz {\n  color: lightblue;\n}\n\n.masthead___3qL9t .humility___Bedqz a {\n  color: lightblue;\n}\n\n.masthead___3qL9t .github___qJ_u3 {\n  font-size: 1.5em;\n}\n\n.counterContainer___Jx2OO {\n  text-align: center;\n  margin: 20px;\n}\n"
+    "./src/app/containers/Home/Home.scss": {
+      "home": "home___37uUv",
+      "masthead": "masthead___2cv8w",
+      "logo": "logo___1r0FC",
+      "humility": "humility___2FGg7",
+      "github": "github___2YGRy",
+      "counterContainer": "counterContainer___32eXu",
+      "_style": ".home___37uUv dd {\n  margin-bottom: 15px;\n}\n\n.masthead___2cv8w {\n  background: #2d2d2d;\n  padding: 40px 20px;\n  color: white;\n  text-align: center;\n}\n\n.masthead___2cv8w .logo___1r0FC {\n  margin: auto;\n  border: 1px solid blue;\n  box-shadow: inset 0 0 10px blue;\n  vertical-align: middle;\n}\n\n.masthead___2cv8w .logo___1r0FC p {\n  line-height: 1.5;\n  margin: 0px;\n}\n\n.masthead___2cv8w .logo___1r0FC img {\n  width: 75%;\n  margin: auto;\n}\n\n.masthead___2cv8w h1 {\n  color: blue;\n  font-size: 4em;\n}\n\n.masthead___2cv8w h2 {\n  color: #ddd;\n  font-size: 2em;\n  margin: 20px;\n}\n\n.masthead___2cv8w a {\n  color: #ddd;\n}\n\n.masthead___2cv8w p {\n  margin: 10px;\n}\n\n.masthead___2cv8w .humility___2FGg7 {\n  color: lightblue;\n}\n\n.masthead___2cv8w .humility___2FGg7 a {\n  color: lightblue;\n}\n\n.masthead___2cv8w .github___2YGRy {\n  font-size: 1.5em;\n}\n\n.counterContainer___32eXu {\n  text-align: center;\n  margin: 20px;\n}\n"
     },
-    "./src/containers/Login/Login.scss": {
-      "loginPage": "loginPage___29OrY",
-      "_style": ".loginPage___29OrY input {\n  padding: 5px 10px;\n  border-radius: 5px;\n  border: 1px solid #ccc;\n}\n\n.loginPage___29OrY form {\n  margin: 30px 0;\n}\n\n.loginPage___29OrY form .btn {\n  margin-left: 10px;\n}\n"
+    "./src/app/containers/Login/Login.scss": {
+      "loginPage": "loginPage___wPazi",
+      "_style": ".loginPage___wPazi input {\n  padding: 5px 10px;\n  border-radius: 5px;\n  border: 1px solid #ccc;\n}\n\n.loginPage___wPazi form {\n  margin: 30px 0;\n}\n\n.loginPage___wPazi form .btn {\n  margin-left: 10px;\n}\n"
     }
   }
 }

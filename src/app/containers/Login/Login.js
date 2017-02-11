@@ -2,8 +2,8 @@ import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux'
 import {pick} from 'ramda'
 import Helmet from 'react-helmet'
-import LoginForm from 'components/LoginForm/LoginForm'
-import {fetchUserDetails, removeUserDetails} from 'redux/modules/user'
+import LoginForm from 'app/components/LoginForm/LoginForm'
+import {fetchUserDetails, removeUserDetails} from 'app/redux/modules/user'
 
 export default connect(
   pick(['user']),

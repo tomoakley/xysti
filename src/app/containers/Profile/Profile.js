@@ -2,8 +2,8 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {pick} from 'ramda'
 import Helmet from 'react-helmet'
-import ProfilePage from 'components/Profile/Profile'
-import {removeUserDetails} from 'redux/modules/user'
+import ProfilePage from 'app/components/Profile/Profile'
+import {removeUserDetails} from 'app/redux/modules/user'
 
 export default connect(
   pick(['user']), {removeUserDetails}

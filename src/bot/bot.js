@@ -1,7 +1,7 @@
 import builder, {ChatConnector, UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
 import 'isomorphic-fetch'
 import apiAiRecognizer from 'api-ai-recognizer'
-import config from '../src/config'
+import config from '../config'
 import parseDateTime from './utils/datetime/parse'
 
 export const connector = new ChatConnector({
