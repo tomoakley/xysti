@@ -3,7 +3,6 @@ import 'isomorphic-fetch'
 import {setCookieValue, removeCookie, getCookieValue} from './cookies.js'
 import urlFormat from './urlFormat'
 import {generateJwt, decodeJwt, isJwtExpired} from './jwt'
-import config from '../config'
 
 export const getProfile = idToken => {
   return fetch(`${process.env.AUTH0_DOMAIN}/tokeninfo`, {
@@ -76,8 +75,7 @@ export const reauthenticate = () => {
   return getCookieValue('id_token').then(idToken => {
     if (!idToken) return false
     const {user_id} = decodeJwt(idToken)
-    const {apiHost, apiPort} = config
-    return fetch(`http://${apiHost}:${apiPort}/user/authorize`, {
+    return fetch(`/api/user/authorize`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

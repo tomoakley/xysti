@@ -1,5 +1,8 @@
 require('babel-polyfill');
 
+// DO NOT call this file directly (e.g require('../config'))
+// Instead use Redux and get the 'config' object from state
+
 const environment = {
   development: {
     isProduction: false
@@ -10,32 +13,18 @@ const environment = {
 }[process.env.NODE_ENV || 'development'];
 
 module.exports = Object.assign({
-  host: process.env.HOST || 'localhost',
-  port: process.env.PORT,
-  apiHost: process.env.APIHOST || 'localhost',
-  apiPort: process.env.APIPORT,
-  botHost: process.env.BOTHOST || 'localhost',
-  botPort: process.env.BOTPORT,
   app: {
+    host: process.env.HOST || 'localhost',
+    port: process.env.PORT,
     title: 'Xysti',
-    description: 'On-demand sports and physical activity app',
-    head: {
-      titleTemplate: 'Xysti',
-      meta: [
-        {name: 'description', content: 'On-demand sports and physical activity app'},
-        {charset: 'utf-8'},
-        {property: 'og:site_name', content: 'Xysti'},
-        {property: 'og:image', content: ''},
-        {property: 'og:locale', content: 'en_US'},
-        {property: 'og:title', content: 'Xysti'},
-        {property: 'og:description', content: 'On-demand sports and physical activity app'},
-        {property: 'og:card', content: 'summary'},
-        {property: 'og:site', content: '@tomoakley'},
-        {property: 'og:creator', content: '@tomoakley'},
-        {property: 'og:image:width', content: '200'},
-        {property: 'og:image:height', content: '200'}
-      ]
-    }
+    description: 'On-demand sports and physical activity app'
   },
-
+  bot: {
+    host: process.env.BOT_HOST || 'localhost',
+    port: process.env.BOT_PORT
+  },
+  api: {
+    host: process.env.API_HOST || 'localhost',
+    port: process.env.API_PORT
+  }
 }, environment);

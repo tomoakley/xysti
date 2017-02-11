@@ -2,7 +2,7 @@ import passport from 'passport'
 import LocalStrategy from 'passport-local'
 import FacebookStrategy from 'passport-facebook'
 import {verifyJwt, generateJwt} from '../src/utils/jwt'
-import {getRefreshToken, getUserById, auth0ManagementApiJwt, addFacebookID} from './actions/User'
+import {addRefreshToken, getUserById, auth0ManagementApiJwt, addFacebookID} from './actions/User'
 import 'isomorphic-fetch'
 
 const configureAuth = (app, config) => {
@@ -35,7 +35,7 @@ const configureAuth = (app, config) => {
       return verifyJwt(id_token, (jwtErr, decoded) => {
         if (jwtErr) return jwtErr
         const {sub: user_id, email, picture, name, exp, iat, aud} = decoded
-        getRefreshToken(user_id, refresh_token)
+        addRefreshToken(user_id, refresh_token)
         return done(null, {user_id, email, picture, name})
       })
     } catch (err) {
@@ -91,7 +91,6 @@ const configureAuth = (app, config) => {
   passport.deserializeUser(async(id, done) => {
     try {
       const user = await getUserById(id)
-      console.log('deserialized user', user)
       done(null, user)
     } catch (err) {
       done(err, false) 

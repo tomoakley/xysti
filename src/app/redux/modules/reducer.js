@@ -7,7 +7,7 @@ import appFactory from './app'
 
 export default function reducerFactory({config}) {
   return combineReducers({
-    app: appFactory({config}),
+    config: appFactory({config}),
     routing: routerReducer,
     reduxAsyncConnect,
     user

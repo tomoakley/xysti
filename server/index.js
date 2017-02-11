@@ -15,7 +15,12 @@ const server = new http.Server(app)
 const io = new SocketIo(server);
 io.path('/ws');
 
-const {apiPort, apiHost} = config
+const {
+  api: {
+    host: apiHost,
+    port: apiPort 
+  }
+} = config
 
 app.use(session({
   secret: 'react and redux',

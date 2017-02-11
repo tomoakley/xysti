@@ -9,7 +9,6 @@ var host = (process.env.HOST || 'localhost');
 var port = (+process.env.PORT + 1) || 3001;
 
 const NODE_ENV = process.env.NODE_ENV
-var dotenv = require('dotenv')
 
 // https://github.com/halt-hammerzeit/webpack-isomorphic-tools
 var WebpackIsomorphicToolsPlugin = require('webpack-isomorphic-tools/plugin');

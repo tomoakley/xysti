@@ -21,7 +21,7 @@ export default class Login extends Component {
 
   onLoginSubmit(event) {
     event.preventDefault()
-    fetch('http://localhost:3030/login', {
+    fetch('/api/login', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
