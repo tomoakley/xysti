@@ -1,6 +1,5 @@
 import Express from 'express';
 import React from 'react';
-import {dispatch} from 'redux'
 import ReactDOM from 'react-dom/server';
 import config from '../config';
 import favicon from 'serve-favicon';
@@ -13,8 +12,6 @@ import ApiClient from './helpers/ApiClient';
 import Html from './helpers/Html';
 import PrettyError from 'pretty-error';
 import http from 'http';
-import passport from 'passport'
-import FacebookStrategy from 'passport-facebook'
 import { match } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import { ReduxAsyncConnect, loadOnServer } from 'redux-async-connect';
@@ -64,8 +61,8 @@ proxy.on('error', (error, req, res) => {
 });
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
   next()
 })
 

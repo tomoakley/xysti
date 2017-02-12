@@ -10,9 +10,7 @@ function isEmptyArray(val) {
  * ampersand to query string when a query parameter is an empty array
  */
 export default function urlFormat({query, ...otherUrlParams}) {
-  if (query !== undefined) {
-    query = reject(isEmptyArray, query)
-  }
+  if (query !== undefined) query = reject(isEmptyArray, query) // eslint-disable-line no-param-reassign
   return urllib.format({
     query,
     ...otherUrlParams

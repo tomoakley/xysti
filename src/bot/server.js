@@ -5,12 +5,9 @@ import {connector} from './bot'
 const {
   bot: {
     port: botPort,
-    host: botHost 
+    host: botHost
   },
-  api: {
-    port: apiPort,
-    host: apiHost
-  }
+  api: { port: apiPort }
 } = config
 
 const app = express()
@@ -23,6 +20,3 @@ app.listen(botPort, (err) => {
     console.info(`==> 💻  Open http://${botHost}:${botPort} in an emulator to talk to the chatbot`)
   }
 })
-
-
-

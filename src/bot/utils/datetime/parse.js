@@ -7,7 +7,7 @@ const parseDateTime = (date, time) => {
       from: chrono.parseDate(`${date} ${time[0]}`),
       to: chrono.parseDate(`${date} ${time[1]}}`)
     }
-  } else if (typeof time == 'string') {
+  } else if (typeof time === 'string') {
     datetime = {
       from: chrono.parseDate(`${date} ${time}`),
       to: chrono.parseDate(`${date} ${time}`)

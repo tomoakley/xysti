@@ -13,7 +13,7 @@ const geocodeAddress = (address) => {
     method: 'GET',
     headers: {
       'Accept': 'application/json'
-    } 
+    }
   }).then(response => response.json())
 }
 

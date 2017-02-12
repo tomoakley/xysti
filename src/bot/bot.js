@@ -1,6 +1,6 @@
 import builder, {ChatConnector, UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
 import 'isomorphic-fetch'
-import apiAiRecognizer from 'api-ai-recognizer'
+import ApiAiRecognizer from 'api-ai-recognizer'
 import config from '../config'
 import parseDateTime from './utils/datetime/parse'
 
@@ -19,7 +19,7 @@ export const connector = new ChatConnector({
 export const bot = new UniversalBot(connector)
 
 // set up api.ai
-const apiai = new apiAiRecognizer(process.env.APIAI_API_KEY)
+const apiai = new ApiAiRecognizer(process.env.APIAI_API_KEY)
 const intents = new IntentDialog({
   recognizers: [apiai]
 })
@@ -34,7 +34,7 @@ bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 bot.beginDialogAction('help', '/help', { matches: /^help/i });
 
 bot.dialog('/help', [(session) => {
-  session.endDialog("Global commands that are available anytime:\n\n* menu - Exits a demo and returns to the menu.\n* goodbye - End this conversation.\n* help - Displays these commands.");
+  session.endDialog('Global commands that are available anytime:\n\n* menu - Exits a demo and returns to the menu.\n* goodbye - End this conversation.\n* help - Displays these commands.');
 }])
 
 bot.dialog('/', intents) // pass all messages through api.ai
@@ -50,7 +50,8 @@ bot.dialog('/collectEntities', [
     const {missingEntities} = args
     session.dialogData.entities = args.entities
     session.dialogData.missingEntities = missingEntities
-    missingEntities.length > 0 ? builder.Prompts.text(session, args.entities[missingEntities[0]].prompt) : session.replaceDialog('/findSession', session.dialogData.entities)
+    if (missingEntities.length > 0) builder.Prompts.text(session, args.entities[missingEntities[0]].prompt)
+    else session.replaceDialog('/findSession', session.dialogData.entities)
   },
   (session, results) => {
     const {missingEntities} = session.dialogData
@@ -74,7 +75,7 @@ intents.matches('session.query', [
       time: { value: time ? time.entity.split('/') : null, prompt: 'What time do you want to do that?' }
     }
     session.dialogData.missingEntities = getEntities(session.dialogData.entities)
-    session.replaceDialog('/collectEntities', session.dialogData) 
+    session.replaceDialog('/collectEntities', session.dialogData)
   }
 ])
 
@@ -82,24 +83,24 @@ bot.dialog('/findSession', [
   (session, args) => {
     const {sport, location, date, time} = args
     const datetime = parseDateTime(date.value, time.value)
-    const addDetailsToSession = (session, details, facebookId) => {
+    const addDetailsToSession = (session, details, facebookId) => { // eslint-disable-line no-shadow
       session.dialogData.sessionDetails = {...details, facebookId}
-      return session 
+      return session
     }
     fetch(`http://${apiHost}:${apiPort}/session/find`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json' 
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        title: sport.value, 
-        location: location.value, 
-        datetime: datetime.from 
+        title: sport.value,
+        location: location.value,
+        datetime: datetime.from
       })
     }).then(response => response.json())
     .then(data => {
-      var msg = new builder.Message(session)
+      const msg = new builder.Message(session)
         .attachments([
           new builder.HeroCard(session)
             .title(data.title)
@@ -107,12 +108,12 @@ bot.dialog('/findSession', [
             .images([
                 builder.CardImage.create(session, 'http://cache2.asset-cache.net/xt/467826952.jpg?v=1&g=fs2|0|editorial186|26|952&s=1&b=NA==')
             ])
-            .buttons([builder.CardAction.postBack(addDetailsToSession(session, {...data}, '10205942258634763'), 'Book this session', "Book this session")]) // TODO facebookId needs to be obtained from session data
+            .buttons([builder.CardAction.postBack(addDetailsToSession(session, {...data}, '10205942258634763'), 'Book this session', 'Book this session')]) // TODO facebookId needs to be obtained from session data
         ]);
-        builder.Prompts.text(session, msg)
+      builder.Prompts.text(session, msg)
     }).catch(err => console.log(`ERROR: ${err}`))
   },
-  (session, args) => session.replaceDialog('/bookSession', session.dialogData)
+  (session, args) => session.replaceDialog('/bookSession', session.dialogData) // eslint-disable-line no-unused-vars
 ])
 
 bot.dialog('/bookSession', [
@@ -122,12 +123,12 @@ bot.dialog('/bookSession', [
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json' 
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({...sessionDetails})
     }).then(response => response.json())
-      .then(session => console.log('session', session))
+      .then(details => console.log('session', details))
       .catch(err => console.log(`Error booking session on chatbot: ${err}`))
     session.send('Session booked')
-  } 
+  }
 ])
