@@ -1,11 +1,12 @@
 import React, {Component, PropTypes} from 'react'
+import 'isomorphic-fetch'
 import {connect} from 'react-redux'
 import {pick} from 'ramda'
 import Helmet from 'react-helmet'
 import config from '../../../config'
-import {reauthenticate} from 'utils/AuthService'
 import Header from 'app/components/Header/Header'
 import {fetchUserDetails} from 'app/redux/modules/user'
+import {isLoggedIn} from 'utils/AuthService'
 import FETCH_STATES from 'utils/redux/FETCH_STATES'
 
 export default connect(
@@ -22,12 +23,14 @@ export default connect(
       store: PropTypes.object.isRequired
     }
 
-    componentDidMount() {
-      const {
-        user: {fetchState}
-      } = this.props
-      if (fetchState === FETCH_STATES.INIT) reauthenticate().then(data => this.props.fetchUserDetails(data))
-    }
+    componentWillMount() {
+      const {user} = this.props
+      if (user.fetchState === FETCH_STATES.INIT) {
+        isLoggedIn().then(data => {
+          this.props.fetchUserDetails(data)
+        })
+      }
+    } // this should all go into a redux-async-connect method (@asyncConnect)
 
     render() {
       const {user} = this.props

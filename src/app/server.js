@@ -1,6 +1,7 @@
 import Express from 'express';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
+import fs from 'fs'
 import config from '../config';
 import favicon from 'serve-favicon';
 import compression from 'compression';
@@ -32,6 +33,11 @@ app.use(compression());
 app.use(favicon(path.join(__dirname, '..', '..', 'static', 'favicon.ico')));
 app.use(cookieParser())
 app.use(Express.static(path.join(__dirname, '..', '..', 'static')));
+
+app.get('/signup', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.send(fs.readFileSync(path.join(__dirname, 'index.html')))
+})
 
 // Proxy to API server
 app.use('/api', (req, res) => {

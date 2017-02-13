@@ -5,7 +5,7 @@ import http from 'http'
 import SocketIo from 'socket.io'
 const RedisStore = require('connect-redis')(session)
 import config from '../src/config'
-import {authorize, login, linkAccount, auth0ManagementApiJwt} from './actions/User'
+import {authorize, login, linkAccount, auth0ManagementApiJwt, checkAuth} from './actions/User'
 import {find, book, list} from './actions/Session'
 import configureAuth from './configureAuth'
 
@@ -43,6 +43,7 @@ configureAuth(app, config)
 
 app.post('/user/authorize', authorize)
 app.post('/user/link', linkAccount)
+app.get('/user/checkAuth', checkAuth)
 app.post('/session/find', find)
 app.post('/session/book', book)
 app.get('/sessions/list/:user_id', list)

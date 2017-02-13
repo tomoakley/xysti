@@ -1,19 +1,9 @@
 {
   "javascript": {
-    "main": "http://localhost:3001/dist/main-63865faada9a0abecd1f.js"
+    "main": "http://localhost:3001/dist/main-5cccbfd7f3cde43b7102.js"
   },
   "styles": {},
   "assets": {
-    "./src/app/components/Header/header.scss": {
-      "siteHeader": "siteHeader___3lCAa",
-      "headerLogo": "headerLogo___J-4qQ",
-      "headerUser": "headerUser___U06LY",
-      "headerUser__picture": "headerUser__picture___26zsF",
-      "_style": ".siteHeader___3lCAa {\n  background: #eee;\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: justify;\n      justify-content: space-between;\n  -ms-flex-align: center;\n      align-items: center;\n  padding: 0 20px;\n}\n\n.headerLogo___J-4qQ {\n  font-weight: bold;\n  font-size: 24px;\n  font-size: 2.4rem;\n  color: #444;\n  text-decoration: none;\n}\n\n.headerUser___U06LY {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-align: center;\n      align-items: center;\n  text-decoration: none;\n  padding: 10px;\n  color: #444;\n  transition: all 0.2s ease;\n}\n\n.headerUser___U06LY:hover {\n  color: white;\n  background: #49E273;\n}\n\n.headerUser___U06LY:hover .headerUser__picture___26zsF {\n  border-color: white;\n}\n\n.headerUser___U06LY .headerUser__picture___26zsF {\n  width: 48px;\n  margin-right: 10px;\n  border-radius: 100%;\n  border: solid transparent 3px;\n}\n"
-    },
-    "./src/app/containers/App/App.scss": {
-      "_style": "html {\n  font-size: 62.5%;\n}\n\nbody {\n  margin: 0;\n  font-family: sans-serif;\n  font-size: 16px;\n  font-size: 1.6rem;\n}\n"
-    },
     "./src/app/containers/Home/Home.scss": {
       "home": "home___37uUv",
       "masthead": "masthead___2cv8w",
@@ -26,6 +16,16 @@
     "./src/app/containers/Login/Login.scss": {
       "loginPage": "loginPage___wPazi",
       "_style": ".loginPage___wPazi input {\n  padding: 5px 10px;\n  border-radius: 5px;\n  border: 1px solid #ccc;\n}\n\n.loginPage___wPazi form {\n  margin: 30px 0;\n}\n\n.loginPage___wPazi form .btn {\n  margin-left: 10px;\n}\n"
+    },
+    "./src/app/components/Header/header.scss": {
+      "siteHeader": "siteHeader___3lCAa",
+      "headerLogo": "headerLogo___J-4qQ",
+      "headerUser": "headerUser___U06LY",
+      "headerUser__picture": "headerUser__picture___26zsF",
+      "_style": ".siteHeader___3lCAa {\n  background: #eee;\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: justify;\n      justify-content: space-between;\n  -ms-flex-align: center;\n      align-items: center;\n  padding: 0 20px;\n}\n\n.headerLogo___J-4qQ {\n  font-weight: bold;\n  font-size: 24px;\n  font-size: 2.4rem;\n  color: #444;\n  text-decoration: none;\n}\n\n.headerUser___U06LY {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-align: center;\n      align-items: center;\n  text-decoration: none;\n  padding: 10px;\n  color: #444;\n  transition: all 0.2s ease;\n}\n\n.headerUser___U06LY:hover {\n  color: white;\n  background: #49E273;\n}\n\n.headerUser___U06LY:hover .headerUser__picture___26zsF {\n  border-color: white;\n}\n\n.headerUser___U06LY .headerUser__picture___26zsF {\n  width: 48px;\n  margin-right: 10px;\n  border-radius: 100%;\n  border: solid transparent 3px;\n}\n"
+    },
+    "./src/app/containers/App/App.scss": {
+      "_style": "html {\n  font-size: 62.5%;\n}\n\nbody {\n  margin: 0;\n  font-family: sans-serif;\n  font-size: 16px;\n  font-size: 1.6rem;\n}\n"
     }
   }
 }

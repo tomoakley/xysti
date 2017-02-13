@@ -28,12 +28,12 @@ export default class Header extends Component {
 
   render() {
     const {
-      user: {auth}
+      user: {id}
     } = this.props
     return (
       <header className={styles.siteHeader}>
         {this.renderLogo()}
-        {auth ? this.renderUser() : this.renderLoginMessage()}
+        {id ? this.renderUser() : this.renderLoginMessage()}
       </header>
     )
   }

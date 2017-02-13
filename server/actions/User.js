@@ -97,8 +97,10 @@ export const login = async (username, password) => {
 export const authorize = (req, res) => {
   const {id} = req.body
   const {AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_SECRET} = process.env
-  User.find({ where: {user_id: id} }).then(user => {
-    const {refresh_token} = user.dataValues
+  User.findOne({ where: {user_id: id} }).then(user => {
+    console.log('user', user)
+    user = user.get({ plain: true })
+    const {refresh_token} = user
     return fetch(`https://${AUTH0_DOMAIN}/delegation`, {
       method: 'POST',
       headers: {
@@ -117,11 +119,8 @@ export const authorize = (req, res) => {
       const {id_token} = data
       return verifyJwt(id_token, (jwtErr, decoded) => {
         if (jwtErr) return jwtErr
-        const {sub: user_id, email: emailAddress, picture, name, exp, iat, aud} = decoded
-        generateJwt({user_id, exp, iat, aud}, AUTH0_SECRET, true, (err, token) => {
-          if (err) console.log(err)
-          else res.json({token, user_id, emailAddress, picture, name})
-        })
+        const {sub: user_id, email, picture, name} = decoded
+        res.json({user_id, email, picture, name}) 
       })
     }).catch(err => res.json(`Delegation error: ${err}`))
   }).catch(error => console.log(`Sequelize error: ${error}`))
@@ -183,4 +182,12 @@ export const getUserById = id => {
     }
   }).then(response => response.json())
   .catch(err => console.log(`getUserById error: ${err}`))
+}
+
+/* GET checkAuth
+ * Return the session details if they exist
+ */
+export const checkAuth = (req, res) => {
+  const user_id = req.session.passport && req.session.passport.user ? req.session.passport.user : null
+  res.json({user_id})
 }
