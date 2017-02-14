@@ -95,35 +95,38 @@ export const login = async (username, password) => {
  * TODO Needs refactoring as very ineffecient
  */
 export const authorize = (req, res) => {
-  const {id} = req.body
-  const {AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_SECRET} = process.env
-  User.findOne({ where: {user_id: id} }).then(user => {
-    console.log('user', user)
-    user = user.get({ plain: true })
-    const {refresh_token} = user
-    return fetch(`https://${AUTH0_DOMAIN}/delegation`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        client_id: AUTH0_CLIENT_ID,
-        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-        refresh_token: refresh_token,
-        scope: 'openid profile email'
+  const user_id = req.session.passport && req.session.passport.user ? req.session.passport.user : null
+  if (user_id) {
+    const {AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_SECRET} = process.env
+    User.findOne({ where: {user_id} }).then(user => {
+      user = user.get({ plain: true })
+      const {refresh_token} = user
+      return fetch(`https://${AUTH0_DOMAIN}/delegation`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          client_id: AUTH0_CLIENT_ID,
+          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          refresh_token: refresh_token,
+          scope: 'openid profile email'
+        })
       })
-    })
-    .then(response => response.json())
-    .then(data => {
-      const {id_token} = data
-      return verifyJwt(id_token, (jwtErr, decoded) => {
-        if (jwtErr) return jwtErr
-        const {sub: user_id, email, picture, name} = decoded
-        res.json({user_id, email, picture, name}) 
-      })
-    }).catch(err => res.json(`Delegation error: ${err}`))
-  }).catch(error => console.log(`Sequelize error: ${error}`))
+      .then(response => response.json())
+      .then(data => {
+        const {id_token} = data
+        return verifyJwt(id_token, (jwtErr, decoded) => {
+          if (jwtErr) return jwtErr
+          const {sub: user_id, email, picture, name} = decoded
+          res.json({user_id, email, picture, name}) 
+        })
+      }).catch(err => res.json(`Delegation error: ${err}`))
+    }).catch(error => console.log(`Sequelize error: ${error}`))
+  } else {
+    res.json({})
+  }
 }
 
 /* linkAccount

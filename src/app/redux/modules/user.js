@@ -76,7 +76,7 @@ function requestUserDetails() {
   }
 }
 
-function receiveUserDetailsSuccess({user_id: id, email, name, picture}) {
+export function receiveUserDetailsSuccess({user_id: id, email, name, picture}) {
   return {
     type: FETCH_USER_DETAILS_SUCCESS,
     id,
@@ -102,13 +102,16 @@ function removeUserDetailsSuccess() {
 }
 
 export function fetchUserDetails(userDetails) {
+  console.log('redux user', userDetails)
   return function _fetchUserDetails(dispatch) {
-    dispatch(requestUserDetails())
+    const promises = []
+    promises.push(dispatch(requestUserDetails()))
     try {
-      dispatch(receiveUserDetailsSuccess(userDetails))
+      promises.push(dispatch(receiveUserDetailsSuccess(userDetails)))
     } catch (err) {
-      dispatch(receiveUserDetailsFailure(err))
+      promises.push(dispatch(receiveUserDetailsFailure(err)))
     }
+    Promise.all(promises)
   }
 }
 

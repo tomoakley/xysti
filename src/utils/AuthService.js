@@ -1,8 +1,7 @@
 import 'es6-promise'
 import 'isomorphic-fetch'
-import {setCookieValue, removeCookie, getCookieValue} from './cookies.js'
 import urlFormat from './urlFormat'
-import {generateJwt, decodeJwt} from './jwt'
+import {generateJwt} from './jwt'
 
 export const getProfile = idToken => {
   return fetch(`${process.env.AUTH0_DOMAIN}/tokeninfo`, {
@@ -71,59 +70,19 @@ export const getUserById = id => {
 } */
 
 
-export const reauthenticate = () => {
-  return getCookieValue('id_token').then(idToken => {
-    if (!idToken) return false
-    const {user_id} = decodeJwt(idToken)
-    return fetch(`/api/user/authorize`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        id: user_id
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      const {token: id_token, user_id, emailAddress, picture, name} = data // eslint-disable-line no-shadow
-      setCookieValue('id_token', id_token)
-      return {id_token, user_id, emailAddress, picture, name}
-    }).catch(err => console.log(`Reauthentication error: ${err}`))
-  }).catch(error => console.log(`Cookie error: ${error}`))
-}
-
-export const isLoggedIn = async() => {
-  console.log('isLoggedIn!')
+export const reauthenticate = async() => {
   try {
-    const userIdResponse = await fetch('http://localhost:3030/user/checkAuth', {
-      method: 'GET',
+    const response = await fetch('http://localhost:3030/user/authorize', {
+      method: 'POST',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       }
     })
-    const userId = await userIdResponse.json()
-    const authorizeResponse = await fetch('http://localhost:3030/user/authorize', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        id: userId.user_id
-      })
-    })
-    const authorized = await authorizeResponse.json()
-    return authorized
+    return await response.json()
   } catch (err) {
     console.log(err)
     return null
   }
-}
-
-export const logout = () => {
-  removeCookie('id_token')
 }

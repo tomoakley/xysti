@@ -5,12 +5,29 @@ import {pick} from 'ramda'
 import Helmet from 'react-helmet'
 import config from '../../../config'
 import Header from 'app/components/Header/Header'
-import {fetchUserDetails} from 'app/redux/modules/user'
-import {isLoggedIn} from 'utils/AuthService'
-import FETCH_STATES from 'utils/redux/FETCH_STATES'
+import {receiveUserDetailsSuccess} from 'app/redux/modules/user'
+import {receiveSessionsSuccess} from 'app/redux/modules/sessions'
+import {fetchSessionList} from 'utils/sessions'
+import {reauthenticate} from 'utils/AuthService'
+import {asyncConnect} from 'redux-async-connect'
+
+@asyncConnect([{
+  promise: ({ store: { dispatch, getState } }) => {
+    reauthenticate().then(data => {
+      Promise.resolve(dispatch(receiveUserDetailsSuccess(data))) // TODO make this use fetchUserDetails instead of the insider function
+    }).then(() => {
+      const {
+        user: {id}
+      } = getState()
+      if (id) {
+        fetchSessionList(id).then(sessionList => Promise.resolve(dispatch(receiveSessionsSuccess(sessionList)))) // TODO same as above, use fetchSessions instead
+      }
+    })
+  }
+}])
 
 export default connect(
-  pick(['user']), {fetchUserDetails}
+  pick(['user']), {}
 )(
   class App extends Component {
     static propTypes = {
@@ -22,15 +39,6 @@ export default connect(
     static contextTypes = {
       store: PropTypes.object.isRequired
     }
-
-    componentWillMount() {
-      const {user} = this.props
-      if (user.fetchState === FETCH_STATES.INIT) {
-        isLoggedIn().then(data => {
-          this.props.fetchUserDetails(data)
-        })
-      }
-    } // this should all go into a redux-async-connect method (@asyncConnect)
 
     render() {
       const {user} = this.props
