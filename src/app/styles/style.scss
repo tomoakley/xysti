@@ -1,0 +1,14 @@
+/*
+ * ------------------------------------------------------
+ * Default stylesheet for Xysti front-end
+ * Does not include stuff for individual components
+ * Import this file into individual components
+ * DO NOT CHANGE ORDER OF THE IMPORTS
+ * ------------------------------------------------------
+ */
+
+// Sass stuff at the top so everything works properly
+@import 'helpers/variables';
+
+@import 'base/typography';
+@import 'layout/layout';

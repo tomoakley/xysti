@@ -1,8 +1,7 @@
+@import '../../styles/style';
+
 .siteHeader {
-  background: #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background: $primary;
   padding: 0 20px;
 }
 
@@ -10,7 +9,7 @@
   font-weight: bold;
   font-size: 24px;
   font-size: 2.4rem;
-  color: #444;
+  color: #fff;
   text-decoration: none;
 }
 
@@ -19,19 +18,20 @@
   align-items: center;
   text-decoration: none;
   padding: 10px;
-  color: #444;
+  color: #fff;
   transition: all 0.2s ease;
   &:hover {
-    color: white;
-    background: #49E273; 
+    color: $primary;
+    background: #fff;
     .headerUser__picture {
-      border-color: white; 
+      border-color: $primary;
     }
   }
   .headerUser__picture {
     width: 48px;
     margin-right: 10px;
-    border-radius: 100%; 
+    border-radius: 100%;
     border: solid transparent 3px;
+    transition: all 0.2s ease;
   }
 }

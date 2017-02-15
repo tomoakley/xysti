@@ -1,7 +1,9 @@
 import React, {Component, PropTypes} from 'react'
+import cssModules from 'react-css-modules'
 import styles from './header.scss'
 import {Link} from 'react-router'
 
+@cssModules(styles, {allowMultiple: true})
 export default class Header extends Component {
 
   static propTypes = {
@@ -9,21 +11,21 @@ export default class Header extends Component {
   }
 
   renderLogo() {
-    return <Link to="/" className={styles.headerLogo}>Xysti</Link>
+    return <Link to="/" styleName="headerLogo">Xysti</Link>
   }
 
   renderUser() {
     const {name, picture} = this.props.user
     return (
-      <Link to="/profile" className={styles.headerUser}>
-        <img src={picture} className={styles.headerUser__picture} alt={`${name} picture`} />
-        <span className={`${styles.headerUser__name} strong`}>Hi, {name}</span>
+      <Link to="/profile" styleName="headerUser">
+        <img src={picture} styleName="headerUser__picture" alt={`${name} picture`} />
+        <strong>Hi, {name}</strong>
       </Link>
     )
   }
 
   renderLoginMessage() {
-    return <Link to="/login" className={styles.headerLogin}>Login or sign up</Link>
+    return <Link to="/login" styleName="headerLogin">Login or sign up</Link>
   }
 
   render() {
@@ -31,9 +33,11 @@ export default class Header extends Component {
       user: {id}
     } = this.props
     return (
-      <header className={styles.siteHeader}>
-        {this.renderLogo()}
-        {id ? this.renderUser() : this.renderLoginMessage()}
+      <header styleName="siteHeader">
+        <div styleName="l--constrained display--flex">
+          {this.renderLogo()}
+          {id ? this.renderUser() : this.renderLoginMessage()}
+        </div>
       </header>
     )
   }

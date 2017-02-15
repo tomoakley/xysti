@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react'
+import moment from 'moment'
 
 export default class Session extends Component {
 
@@ -8,14 +9,19 @@ export default class Session extends Component {
     unbookSession: PropTypes.func
   }
 
+  _formatDatetime(datetime) {
+    return moment(datetime).format('dddd D MMM HH:mm')
+  }
+
   renderDetails() {
     const {
       details: {title, location, datetime}
     } = this.props
+    const formattedDate = this._formatDatetime(datetime)
     return (
       <div className="session__details">
-        <h3 className="session__details--title">{title}</h3>
-        <span className="session__details--datetime">{datetime}</span>
+        <h3 className="session__details--title display-color-red">{title}</h3>
+        <span className="session__details--datetime">{formattedDate}</span>
         <span className="session__details--location">{location}</span>
       </div>
     )
@@ -39,12 +45,7 @@ export default class Session extends Component {
           Accept: 'application/json'
         }
       }).then(response => response.json())
-        .then(data => {
-          console.log(data)
-          if (data.rows === 1) {
-            unbookSession(sessionId)
-          }
-        })
+        .then(data => (data.rows === 1) ? unbookSession(sessionId) : console.error(`Rows affected: ${data.rows}, should be 1`))
         .catch(err => console.log(err))
     }
     return <a href="#" onClick={onClick}>Unbook</a>

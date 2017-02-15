@@ -1,18 +1,26 @@
 {
   "javascript": {
-    "main": "http://localhost:3001/dist/main-92d2786f79e1cf780c48.js"
+    "main": "http://localhost:3001/dist/main-d435cfb245e7b248399e.js"
   },
   "styles": {},
   "assets": {
     "./src/app/components/Header/header.scss": {
+      "l--constrained": "l--constrained___1G-NR",
+      "l--content": "l--content___2Zsni",
+      "display--flex": "display--flex___31hsk",
+      "display--block": "display--block___2ylD3",
       "siteHeader": "siteHeader___3lCAa",
       "headerLogo": "headerLogo___J-4qQ",
       "headerUser": "headerUser___U06LY",
       "headerUser__picture": "headerUser__picture___26zsF",
-      "_style": ".siteHeader___3lCAa {\n  background: #eee;\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: justify;\n      justify-content: space-between;\n  -ms-flex-align: center;\n      align-items: center;\n  padding: 0 20px;\n}\n\n.headerLogo___J-4qQ {\n  font-weight: bold;\n  font-size: 24px;\n  font-size: 2.4rem;\n  color: #444;\n  text-decoration: none;\n}\n\n.headerUser___U06LY {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-align: center;\n      align-items: center;\n  text-decoration: none;\n  padding: 10px;\n  color: #444;\n  transition: all 0.2s ease;\n}\n\n.headerUser___U06LY:hover {\n  color: white;\n  background: #49E273;\n}\n\n.headerUser___U06LY:hover .headerUser__picture___26zsF {\n  border-color: white;\n}\n\n.headerUser___U06LY .headerUser__picture___26zsF {\n  width: 48px;\n  margin-right: 10px;\n  border-radius: 100%;\n  border: solid transparent 3px;\n}\n"
+      "_style": "/*\n * ------------------------------------------------------\n * Default stylesheet for Xysti front-end\n * Does not include stuff for individual components\n * Import this file into individual components\n * DO NOT CHANGE ORDER OF THE IMPORTS\n * ------------------------------------------------------\n */\n/* -----------------------\n * Raw colours\n * -----------------------\n */\n/* -----------------------\n * Branding colours\n * -----------------------\n */\nhtml {\n  font-size: 62.5%;\n}\n\nbody {\n  margin: 0;\n  font-family: 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;\n  font-size: 16px;\n  font-size: 1.6rem;\n}\n\n/* ------------------------------\n * Default layout stuff\n * ------------------------------\n */\nhtml, body {\n  margin: 0;\n  padding: 0;\n}\n\n/* ----------------------------\n * Layout constraints\n * ----------------------------\n */\n.l--constrained___1G-NR {\n  max-width: 1440px;\n  margin: 0 auto;\n  width: 100%;\n}\n\n.l--content___2Zsni {\n  max-width: 1140px;\n  margin: 0 auto;\n  width: 100%;\n}\n\n/* ----------------------------------\n * Layout / display helper classes\n * ----------------------------------\n */\n.display--flex___31hsk {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: justify;\n      justify-content: space-between;\n  -ms-flex-direction: row;\n      flex-direction: row;\n  -ms-flex-align: center;\n      align-items: center;\n}\n\n.display--block___2ylD3 {\n  display: block;\n}\n\n.siteHeader___3lCAa {\n  background: #7ED320;\n  padding: 0 20px;\n}\n\n.headerLogo___J-4qQ {\n  font-weight: bold;\n  font-size: 24px;\n  font-size: 2.4rem;\n  color: #fff;\n  text-decoration: none;\n}\n\n.headerUser___U06LY {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-align: center;\n      align-items: center;\n  text-decoration: none;\n  padding: 10px;\n  color: #fff;\n  transition: all 0.2s ease;\n}\n\n.headerUser___U06LY:hover {\n  color: #7ED320;\n  background: #fff;\n}\n\n.headerUser___U06LY:hover .headerUser__picture___26zsF {\n  border-color: #7ED320;\n}\n\n.headerUser___U06LY .headerUser__picture___26zsF {\n  width: 48px;\n  margin-right: 10px;\n  border-radius: 100%;\n  border: solid transparent 3px;\n  transition: all 0.2s ease;\n}\n"
     },
     "./src/app/containers/App/App.scss": {
-      "_style": "html {\n  font-size: 62.5%;\n}\n\nbody {\n  margin: 0;\n  font-family: sans-serif;\n  font-size: 16px;\n  font-size: 1.6rem;\n}\n"
+      "l--constrained": "l--constrained___32T86",
+      "l--content": "l--content___336AD",
+      "display--flex": "display--flex___JWcNQ",
+      "display--block": "display--block___1DPHh",
+      "_style": "/*\n * ------------------------------------------------------\n * Default stylesheet for Xysti front-end\n * Does not include stuff for individual components\n * Import this file into individual components\n * DO NOT CHANGE ORDER OF THE IMPORTS\n * ------------------------------------------------------\n */\n/* -----------------------\n * Raw colours\n * -----------------------\n */\n/* -----------------------\n * Branding colours\n * -----------------------\n */\nhtml {\n  font-size: 62.5%;\n}\n\nbody {\n  margin: 0;\n  font-family: 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;\n  font-size: 16px;\n  font-size: 1.6rem;\n}\n\n/* ------------------------------\n * Default layout stuff\n * ------------------------------\n */\nhtml, body {\n  margin: 0;\n  padding: 0;\n}\n\n/* ----------------------------\n * Layout constraints\n * ----------------------------\n */\n.l--constrained___32T86 {\n  max-width: 1440px;\n  margin: 0 auto;\n  width: 100%;\n}\n\n.l--content___336AD {\n  max-width: 1140px;\n  margin: 0 auto;\n  width: 100%;\n}\n\n/* ----------------------------------\n * Layout / display helper classes\n * ----------------------------------\n */\n.display--flex___JWcNQ {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: justify;\n      justify-content: space-between;\n  -ms-flex-direction: row;\n      flex-direction: row;\n  -ms-flex-align: center;\n      align-items: center;\n}\n\n.display--block___1DPHh {\n  display: block;\n}\n"
     },
     "./src/app/containers/Home/Home.scss": {
       "home": "home___37uUv",

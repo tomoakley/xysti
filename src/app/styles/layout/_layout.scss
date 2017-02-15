@@ -1,0 +1,42 @@
+/* ------------------------------
+ * Default layout stuff
+ * ------------------------------
+ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+/* ----------------------------
+ * Layout constraints
+ * ----------------------------
+ */
+
+.l--constrained {
+  max-width: $maxWidth;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.l--content {
+  max-width: $contentWidth;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ----------------------------------
+ * Layout / display helper classes
+ * ----------------------------------
+ */
+
+.display--flex {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+}
+
+.display--block {
+  display: block;
+}

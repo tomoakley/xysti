@@ -1,7 +1,8 @@
-import React, {Component, PropTypes} from 'react';
-import ReactDOM from 'react-dom/server';
-import serialize from 'serialize-javascript';
-import Helmet from 'react-helmet';
+import React, {Component, PropTypes} from 'react'
+import ReactDOM from 'react-dom/server'
+import serialize from 'serialize-javascript'
+import Helmet from 'react-helmet'
+import Typekit from 'react-typekit'
 
 /**
  * Wrapper component containing HTML metadata and boilerplate tags.
@@ -17,7 +18,7 @@ export default class Html extends Component {
     assets: PropTypes.object,
     component: PropTypes.node,
     store: PropTypes.object
-  };
+  }
 
   render() {
     const {assets, component, store} = this.props;
@@ -34,6 +35,9 @@ export default class Html extends Component {
 
           <link rel="shortcut icon" href="/favicon.ico" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+          <Typekit kitId="gyy6zpm" />
+
           {/* styles (will be present only in production with webpack extract text plugin) */}
           {Object.keys(assets.styles).map((style, key) =>
             <link href={assets.styles[style]} key={key} media="screen, projection"
