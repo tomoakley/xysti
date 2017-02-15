@@ -6,7 +6,7 @@ import SocketIo from 'socket.io'
 const RedisStore = require('connect-redis')(session)
 import config from '../src/config'
 import {authorize, login, linkAccount, auth0ManagementApiJwt, checkAuth} from './actions/User'
-import {find, book, list} from './actions/Session'
+import {find, book, list, remove} from './actions/Session'
 import configureAuth from './configureAuth'
 
 const app = express()
@@ -18,7 +18,7 @@ io.path('/ws');
 const {
   api: {
     host: apiHost,
-    port: apiPort 
+    port: apiPort
   }
 } = config
 
@@ -47,6 +47,7 @@ app.get('/user/checkAuth', checkAuth)
 app.post('/session/find', find)
 app.post('/session/book', book)
 app.get('/sessions/list/:user_id', list)
+app.delete('/sessions/delete/:user_id/:session_id', remove)
 app.get('/jwt', (req, res) => {
   res.json(auth0ManagementApiJwt(['read', 'update']))
 })

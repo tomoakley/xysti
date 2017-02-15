@@ -3,17 +3,18 @@ import {connect} from 'react-redux'
 import {pick} from 'ramda'
 import Helmet from 'react-helmet'
 import SessionList from 'app/components/Sessions/SessionList'
-import {fetchSessions} from 'app/redux/modules/sessions'
+import {fetchSessions, unbookSession} from 'app/redux/modules/sessions'
 
 @connect(
-  pick(['sessions', 'user']), {fetchSessions}
+  pick(['sessions', 'user']), {fetchSessions, unbookSession}
 )
 export default class Home extends Component {
 
   static propTypes = {
     user: PropTypes.object,
     sessions: PropTypes.object,
-    fetchSessions: PropTypes.func
+    fetchSessions: PropTypes.func,
+    unbookSession: PropTypes.func
   }
 
   render() {
@@ -26,7 +27,7 @@ export default class Home extends Component {
       <div className={styles.home}>
         <Helmet title="Home"/>
         <h2 style={{display: 'inline-block'}}>Xysti is an on-demand sports app, which you interact with through a chatbot</h2>
-        <SessionList sessions={items} user={user} fetchSessions={this.props.fetchSessions} />
+        <SessionList sessions={items} user={user} fetchSessions={this.props.fetchSessions} unbookSession={this.props.unbookSession} />
       </div>
     )
   }

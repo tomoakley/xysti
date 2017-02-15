@@ -27,7 +27,7 @@ export const book = async(req, res) => {
     where: { title, location, datetime }
   }).spread((session, created) => {
     session = session.get({ plain: true })
-    return session.id 
+    return session.id
   })
   const userID = await findUserByFacebookID(facebookId)
   const bookedSession = await BookedSession.create({
@@ -37,23 +37,32 @@ export const book = async(req, res) => {
   res.json({...bookedSession})
 }
 
+/* DELETE /session/:user_id/:session_id
+ * Delete a booked session
+ */
+export const remove = async(req, res) => {
+  const {user_id, session_id} = req.params
+  const rowsAffected = BookedSession.destroy({ where: {user_id, session_id}, limit: 1 })
+  rowsAffected.then(rows => res.json({rows, session_id}))
+}
+
 /* GET sessions/list/:user_id
  * List all sessions booked by user_id
- */ 
+ */
 export const list = async(req, res) => {
   const {user_id} = req.params
   const sessionIds = await BookedSession.findAll({
-    where: { user_id } 
+    where: { user_id }
   }).then(sessions => {
     var session_ids = []
     sessions.forEach(session => {
-      session_ids.push(session.session_id) 
+      session_ids.push(session.session_id)
     })
     return session_ids
   }).catch(err => reject(err))
   const getSessionDetails = (id) => {
     return Session.findOne({
-      where: { id }   
+      where: { id }
     }).then(session => session.get({ plain: true }))
   }
   const results = Promise.all(sessionIds.map(getSessionDetails))
