@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react'
+import cssModules from 'react-css-modules'
 import 'isomorphic-fetch'
 import {connect} from 'react-redux'
 import {pick} from 'ramda'
@@ -10,6 +11,7 @@ import {receiveSessionsSuccess} from 'app/redux/modules/sessions'
 import {fetchSessionList} from 'utils/sessions'
 import {reauthenticate} from 'utils/AuthService'
 import {asyncConnect} from 'redux-async-connect'
+import styles from './App.scss'
 
 @asyncConnect([{
   promise: ({ store: { dispatch, getState } }) => {
@@ -26,6 +28,7 @@ import {asyncConnect} from 'redux-async-connect'
   }
 }])
 
+@cssModules(styles, {allowMultiple: true})
 export default connect(
   pick(['user']), {}
 )(
@@ -42,12 +45,11 @@ export default connect(
 
     render() {
       const {user} = this.props
-      const styles = require('./App.scss')
       return (
-        <div className={styles.app}>
+        <div>
           <Helmet {...config.app.head}/>
           <Header user={user} />
-          <div className={styles.appContent}>
+          <div styleName="l--content">
             {this.props.children}
           </div>
         </div>

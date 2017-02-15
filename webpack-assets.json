@@ -1,6 +1,6 @@
 {
   "javascript": {
-    "main": "http://localhost:3001/dist/main-d435cfb245e7b248399e.js"
+    "main": "http://localhost:3001/dist/main-52896daf1ce8ddf5b3fd.js"
   },
   "styles": {},
   "assets": {
@@ -23,13 +23,12 @@
       "_style": "/*\n * ------------------------------------------------------\n * Default stylesheet for Xysti front-end\n * Does not include stuff for individual components\n * Import this file into individual components\n * DO NOT CHANGE ORDER OF THE IMPORTS\n * ------------------------------------------------------\n */\n/* -----------------------\n * Raw colours\n * -----------------------\n */\n/* -----------------------\n * Branding colours\n * -----------------------\n */\nhtml {\n  font-size: 62.5%;\n}\n\nbody {\n  margin: 0;\n  font-family: 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;\n  font-size: 16px;\n  font-size: 1.6rem;\n}\n\n/* ------------------------------\n * Default layout stuff\n * ------------------------------\n */\nhtml, body {\n  margin: 0;\n  padding: 0;\n}\n\n/* ----------------------------\n * Layout constraints\n * ----------------------------\n */\n.l--constrained___32T86 {\n  max-width: 1440px;\n  margin: 0 auto;\n  width: 100%;\n}\n\n.l--content___336AD {\n  max-width: 1140px;\n  margin: 0 auto;\n  width: 100%;\n}\n\n/* ----------------------------------\n * Layout / display helper classes\n * ----------------------------------\n */\n.display--flex___JWcNQ {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: justify;\n      justify-content: space-between;\n  -ms-flex-direction: row;\n      flex-direction: row;\n  -ms-flex-align: center;\n      align-items: center;\n}\n\n.display--block___1DPHh {\n  display: block;\n}\n"
     },
     "./src/app/containers/Home/Home.scss": {
-      "home": "home___37uUv",
-      "masthead": "masthead___2cv8w",
-      "logo": "logo___1r0FC",
-      "humility": "humility___2FGg7",
-      "github": "github___2YGRy",
-      "counterContainer": "counterContainer___32eXu",
-      "_style": ".home___37uUv dd {\n  margin-bottom: 15px;\n}\n\n.masthead___2cv8w {\n  background: #2d2d2d;\n  padding: 40px 20px;\n  color: white;\n  text-align: center;\n}\n\n.masthead___2cv8w .logo___1r0FC {\n  margin: auto;\n  border: 1px solid blue;\n  box-shadow: inset 0 0 10px blue;\n  vertical-align: middle;\n}\n\n.masthead___2cv8w .logo___1r0FC p {\n  line-height: 1.5;\n  margin: 0px;\n}\n\n.masthead___2cv8w .logo___1r0FC img {\n  width: 75%;\n  margin: auto;\n}\n\n.masthead___2cv8w h1 {\n  color: blue;\n  font-size: 4em;\n}\n\n.masthead___2cv8w h2 {\n  color: #ddd;\n  font-size: 2em;\n  margin: 20px;\n}\n\n.masthead___2cv8w a {\n  color: #ddd;\n}\n\n.masthead___2cv8w p {\n  margin: 10px;\n}\n\n.masthead___2cv8w .humility___2FGg7 {\n  color: lightblue;\n}\n\n.masthead___2cv8w .humility___2FGg7 a {\n  color: lightblue;\n}\n\n.masthead___2cv8w .github___2YGRy {\n  font-size: 1.5em;\n}\n\n.counterContainer___32eXu {\n  text-align: center;\n  margin: 20px;\n}\n"
+      "l--constrained": "l--constrained___3HkHI",
+      "l--content": "l--content___1keeq",
+      "display--flex": "display--flex___1P_Vb",
+      "display--block": "display--block___3AFSR",
+      "content__home--title": "content__home--title___nymqx",
+      "_style": "/*\n * ------------------------------------------------------\n * Default stylesheet for Xysti front-end\n * Does not include stuff for individual components\n * Import this file into individual components\n * DO NOT CHANGE ORDER OF THE IMPORTS\n * ------------------------------------------------------\n */\n/* -----------------------\n * Raw colours\n * -----------------------\n */\n/* -----------------------\n * Branding colours\n * -----------------------\n */\nhtml {\n  font-size: 62.5%;\n}\n\nbody {\n  margin: 0;\n  font-family: 'Proxima Nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;\n  font-size: 16px;\n  font-size: 1.6rem;\n}\n\n/* ------------------------------\n * Default layout stuff\n * ------------------------------\n */\nhtml, body {\n  margin: 0;\n  padding: 0;\n}\n\n/* ----------------------------\n * Layout constraints\n * ----------------------------\n */\n.l--constrained___3HkHI {\n  max-width: 1440px;\n  margin: 0 auto;\n  width: 100%;\n}\n\n.l--content___1keeq {\n  max-width: 1140px;\n  margin: 0 auto;\n  width: 100%;\n}\n\n/* ----------------------------------\n * Layout / display helper classes\n * ----------------------------------\n */\n.display--flex___1P_Vb {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: justify;\n      justify-content: space-between;\n  -ms-flex-direction: row;\n      flex-direction: row;\n  -ms-flex-align: center;\n      align-items: center;\n}\n\n.display--block___3AFSR {\n  display: block;\n}\n\n.content__home--title___nymqx {\n  text-align: center;\n}\n"
     },
     "./src/app/containers/Login/Login.scss": {
       "loginPage": "loginPage___wPazi",

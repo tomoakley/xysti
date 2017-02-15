@@ -1,34 +1,37 @@
 import React, {Component, PropTypes} from 'react'
+import cssModules from 'react-css-modules'
+import styles from './Home.scss'
 import {connect} from 'react-redux'
 import {pick} from 'ramda'
 import Helmet from 'react-helmet'
-import SessionList from 'app/components/Sessions/SessionList'
+import SessionContainer from 'app/components/Sessions/SessionContainer'
 import {fetchSessions, unbookSession} from 'app/redux/modules/sessions'
 
-@connect(
+@cssModules(styles, {allowMultiple: true})
+export default connect(
   pick(['sessions', 'user']), {fetchSessions, unbookSession}
+)(
+  class Home extends Component {
+
+    static propTypes = {
+      user: PropTypes.object,
+      sessions: PropTypes.object,
+      fetchSessions: PropTypes.func,
+      unbookSession: PropTypes.func
+    }
+
+    render() {
+      const {
+        user,
+        sessions: {items}
+      } = this.props
+      return (
+        <div>
+          <Helmet title="Home"/>
+          <h2 styleName="content__home--title">Xysti is an on-demand sports app, which you interact with through a chatbot</h2>
+          <SessionContainer sessions={items} user={user} fetchSessions={this.props.fetchSessions} unbookSession={this.props.unbookSession} />
+        </div>
+      )
+    }
+  }
 )
-export default class Home extends Component {
-
-  static propTypes = {
-    user: PropTypes.object,
-    sessions: PropTypes.object,
-    fetchSessions: PropTypes.func,
-    unbookSession: PropTypes.func
-  }
-
-  render() {
-    const styles = require('./Home.scss')
-    const {
-      user,
-      sessions: {items}
-    } = this.props
-    return (
-      <div className={styles.home}>
-        <Helmet title="Home"/>
-        <h2 style={{display: 'inline-block'}}>Xysti is an on-demand sports app, which you interact with through a chatbot</h2>
-        <SessionList sessions={items} user={user} fetchSessions={this.props.fetchSessions} unbookSession={this.props.unbookSession} />
-      </div>
-    )
-  }
-}
