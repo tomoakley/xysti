@@ -25,7 +25,7 @@ export default class Header extends Component {
   }
 
   renderLoginMessage() {
-    return <Link to="/login" styleName="headerLogin">Login or sign up</Link>
+    return <Link to="/login">Login or sign up</Link>
   }
 
   render() {
@@ -34,7 +34,7 @@ export default class Header extends Component {
     } = this.props
     return (
       <header styleName="siteHeader">
-        <div styleName="l--constrained display--flex">
+        <div styleName="l--constrained display--flex flex--center-between">
           {this.renderLogo()}
           {id ? this.renderUser() : this.renderLoginMessage()}
         </div>

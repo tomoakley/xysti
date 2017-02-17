@@ -59,7 +59,7 @@ export default class Session extends Component {
         .then(data => (data.rows === 1) ? unbookSession(sessionId) : console.error(`Rows affected: ${data.rows}, should be 1`))
         .catch(err => console.log(err))
     }
-    return <a href="#" styleName="session__button" onClick={onClick}>Unbook</a>
+    return <a href="#" onClick={onClick}>Unbook</a>
   }
 
   renderButton() {
@@ -72,7 +72,7 @@ export default class Session extends Component {
       <li styleName="session__list--session">
         {this.renderImage()}
         {this.renderDetails()}
-        { this._isSessionUpcoming(datetime) ? this.renderUnbookButton() : null}
+        { _isSessionUpcoming(datetime) ? this.renderUnbookButton() : null}
       </li>
     )
   }

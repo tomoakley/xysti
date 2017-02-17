@@ -1,0 +1,56 @@
+@import '../../styles/style';
+
+.session__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  .session__list--session {
+    border: solid thin #ccc;
+    border-radius: 5px;
+    margin: 15px 0 0 2%;
+    flex: 0 0 23.5%;
+    &:nth-child(4n-3) {
+      margin-left: 0;
+    }
+  }
+}
+
+.session__details {
+  line-height: 1.5;
+  padding: 10px;
+}
+
+.session__image {
+  width: 100%;
+  height: 150px;
+}
+
+.session__details--title {
+  margin: 0;
+}
+
+.session__button {
+  display: block;
+  width: 100%;
+  background: #D8D8D8;
+  color: #444;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 0 0 5px 5px;
+}
+
+.session__container--refresh-btn {
+  color: #444;
+  text-decoration: none;
+  padding: 5px;
+  border-radius: 10px;
+  font-weight: bold;
+  &:hover {
+    background: #444;
+    color: white;
+  }
+}

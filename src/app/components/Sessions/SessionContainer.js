@@ -1,7 +1,10 @@
 import React, {Component, PropTypes} from 'react'
+import cssModules from 'react-css-modules'
 import moment from 'moment'
 import SessionList from 'app/components/Sessions/SessionList'
+import styles from './session.scss'
 
+@cssModules(styles, {allowMultiple: true, errorWhenNotFound: false})
 export default class SessionContainer extends Component {
 
   static propTypes = {
@@ -25,10 +28,9 @@ export default class SessionContainer extends Component {
   }
 
   _filterSessionsIntoUpcomingAndPast(sessions) {
-    sessions.map((session, key) => {
-      console.log(key)
+    sessions.map(session => {
       const {datetime} = session
-      if (moment() > moment(datetime).format('DD/MM/YYYY')) {
+      if (moment().isBefore(datetime)) {
         this.setState({ futureSessions: this.state.futureSessions.concat([session]) })
       } else {
         this.setState({ pastSessions: this.state.pastSessions.concat([session]) })
@@ -50,9 +52,11 @@ export default class SessionContainer extends Component {
     const {unbookSession, user} = this.props
     return (
       <div>
-        <h3>Upcoming Sessions</h3>
+        <div styleName="session__container--header display--flex flex--center-between">
+          <h3 styleName="session__container__header--name">Upcoming Sessions</h3>
+          <a href="#" styleName="session__container--refresh-btn" onClick={this.refreshSessions}>Refresh</a>
+        </div>
         <SessionList sessions={futureSessions} user={user} unbookSession={unbookSession} />
-        <a href="#" onClick={this.refreshSessions}>Refresh</a>
       </div>
     )
   }
@@ -62,9 +66,10 @@ export default class SessionContainer extends Component {
     const {unbookSession, user} = this.props
     return (
       <div>
-        <h3>Past Sessions</h3>
+        <div styleName="session__container--header">
+          <h3 styleName="session__container__header--name">Past Sessions</h3>
+        </div>
         <SessionList sessions={pastSessions} user={user} unbookSession={unbookSession} />
-        <a href="#" onClick={this.refreshSessions}>Refresh</a>
       </div>
     )
   }
