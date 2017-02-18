@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import cssModules from 'react-css-modules'
 import moment from 'moment'
+import {pipe, path, complement} from 'ramda'
 import SessionList from 'app/components/Sessions/SessionList'
 import styles from './session.scss'
 
@@ -16,27 +17,21 @@ export default class SessionContainer extends Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      futureSessions: [],
-      pastSessions: []
-    }
     this.refreshSessions = this.refreshSessions.bind(this)
   }
 
-  componentWillReceiveProps(nextProps) {
-    this._filterSessionsIntoUpcomingAndPast(nextProps.sessions) // eventually will move this into the redux sessions module but for now it's good here
+  _getPastSessions(sessions) {
+    return sessions.filter(pipe(path(['datetime']), complement(this._isSessionUpcoming)))
   }
 
-  _filterSessionsIntoUpcomingAndPast(sessions) {
-    sessions.map(session => {
-      const {datetime} = session
-      if (moment().isBefore(datetime)) {
-        this.setState({ futureSessions: this.state.futureSessions.concat([session]) })
-      } else {
-        this.setState({ pastSessions: this.state.pastSessions.concat([session]) })
-      }
-    })
+  _getUpcomingSessions(sessions) {
+    return sessions.filter(pipe(path(['datetime']), this._isSessionUpcoming))
   }
+
+  _isSessionUpcoming(datetime) {
+    return moment().isBefore(datetime) // return TRUE - upcoming; FALSE - past
+  }
+
 
   refreshSessions(event) {
     const {
@@ -48,28 +43,28 @@ export default class SessionContainer extends Component {
   }
 
   renderUpcomingSessions() {
-    const {futureSessions} = this.state
-    const {unbookSession, user} = this.props
+    const {unbookSession, user, sessions} = this.props
+    const upcomingSessions = sessions && sessions.length > 0 ? this._getUpcomingSessions(sessions) : null
     return (
       <div>
         <div styleName="session__container--header display--flex flex--center-between">
           <h3 styleName="session__container__header--name">Upcoming Sessions</h3>
           <a href="#" styleName="session__container--refresh-btn" onClick={this.refreshSessions}>Refresh</a>
         </div>
-        <SessionList sessions={futureSessions} user={user} unbookSession={unbookSession} />
+        {upcomingSessions && upcomingSessions.length > 0 ? <SessionList sessions={upcomingSessions} user={user} unbookSession={unbookSession} /> : <span>No Results Found</span>}
       </div>
     )
   }
 
   renderPastSessions() {
-    const {pastSessions} = this.state
-    const {unbookSession, user} = this.props
+    const {unbookSession, user, sessions} = this.props
+    const pastSessions = sessions && sessions.length > 0 ? this._getPastSessions(sessions) : null
     return (
       <div>
         <div styleName="session__container--header">
           <h3 styleName="session__container__header--name">Past Sessions</h3>
         </div>
-        <SessionList sessions={pastSessions} user={user} unbookSession={unbookSession} />
+        {pastSessions && pastSessions.length > 0 ? <SessionList sessions={pastSessions} user={user} unbookSession={unbookSession} /> : <span>No Results Found</span>}
       </div>
     )
   }

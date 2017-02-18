@@ -1,4 +1,4 @@
-import {remove} from 'ramda'
+import {complement, equals, path, pipe} from 'ramda'
 import FETCH_STATES from 'utils/redux/FETCH_STATES'
 import {fetchSessionList} from 'utils/sessions'
 
@@ -44,18 +44,10 @@ const actionHandlers = {
       error: null
     }
   },
-  [UNBOOK_SESSION_SUCCESS]: function setUnbookSessionSuccessActionHandler(state, {id}) {
-    const {items} = state
-    let newSessions
-    for (let i = 0; i < items.length; i++) { // eslint-disable-line id-length
-      if (items[i].id === id) {
-        newSessions = remove(i, 1, items)
-      }
-    }
+  [UNBOOK_SESSION_SUCCESS]: function setUnbookSessionSuccessActionHandler(state, props) { // eslint-disable-line no-unused-vars
     return {
       fetchState: FETCH_STATES.FETCH_SUCCESSFUL,
-      items: newSessions,
-      error: null
+      ...props
     }
   },
   [UNBOOK_SESSION_FAILURE]: function setUnbookSessionFailureActionHandler(state, {error}) {
@@ -81,7 +73,6 @@ function requestSessions() {
 }
 
 export function receiveSessionsSuccess(items) {
-  console.log('receiveSessionsSuccess', items)
   return {
     type: FETCH_SESSIONS_SUCCESS,
     items,
@@ -116,13 +107,8 @@ function unbookSessionRequest() {
 
 function unbookSessionSuccess(state, id) {
   const {items} = state.sessions
-  let newSessions
-  for (let i = 0; i < items.length; i++) { // eslint-disable-line id-length
-    if (items[i].id === id) {
-      newSessions = remove(i, 1, items)
-    }
-  }
-  console.log('newsessions', newSessions)
+  const equalsId = (idToCompare) => equals(id, idToCompare)
+  const newSessions = items.filter(pipe(path(['id']), complement(equalsId)))
   return {
     type: UNBOOK_SESSION_SUCCESS,
     items: newSessions,
@@ -144,7 +130,7 @@ export function unbookSession(sessionId) {
     try {
       dispatch(unbookSessionSuccess(getState(), sessionId))
     } catch (err) {
-      console.log(err)
+      console.error(err)
       dispatch(unbookSessionFailure(getState(), err))
     }
   }

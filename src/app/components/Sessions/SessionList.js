@@ -16,7 +16,7 @@ export default class SessionList extends Component {
     const {sessions, user} = this.props
     return (
       <ul styleName="session__list display--flex">
-        {sessions ? sessions.map((session, key) => <Session details={session} unbookSession={this.props.unbookSession} user={user} key={key} />) : <li>No Sessions Found</li>}
+        {sessions.map((session, key) => <Session details={session} unbookSession={this.props.unbookSession} user={user} key={key} />)}
       </ul>
     )
   }

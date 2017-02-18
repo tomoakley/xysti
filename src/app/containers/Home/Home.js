@@ -29,7 +29,7 @@ export default connect(
         <div>
           <Helmet title="Home"/>
           <h2 styleName="content__home--title">Xysti is an on-demand sports app, which you interact with through a chatbot</h2>
-          <SessionContainer sessions={items} user={user} fetchSessions={this.props.fetchSessions} unbookSession={this.props.unbookSession} />
+          <SessionContainer sessions={items || null} user={user} fetchSessions={this.props.fetchSessions} unbookSession={this.props.unbookSession} />
         </div>
       )
     }
