@@ -23,44 +23,44 @@ const actionHandlers = {
       error: null
     }
   },
-  [FETCH_SESSIONS_SUCCESS]: function setSessionsSuccessActionHandler(state, {items, error}) {
+  [FETCH_SESSIONS_SUCCESS]: function setSessionsSuccessActionHandler({items, error}) {
     return {
       fetchState: FETCH_STATES.FETCH_SUCCESSFUL,
       items,
       error
     }
   },
-  [FETCH_SESSIONS_FAILURE]: function setSessionsFailureActionHandler(state, {error}) {
+  [FETCH_SESSIONS_FAILURE]: function setSessionsFailureActionHandler({error}) {
     return {
       fetchState: FETCH_STATES.FETCH_FAILED,
       items: [],
       error
     }
   },
-  [UNBOOK_SESSION]: function setUnbookSessionActionHandler(state) {
+  [UNBOOK_SESSION]: function setUnbookSessionActionHandler({items}) {
     return {
       fetchState: FETCH_STATES.IS_FETCHING,
-      items: state.items,
+      items,
       error: null
     }
   },
-  [UNBOOK_SESSION_SUCCESS]: function setUnbookSessionSuccessActionHandler(state, props) { // eslint-disable-line no-unused-vars
+  [UNBOOK_SESSION_SUCCESS]: function setUnbookSessionSuccessActionHandler(props) { // eslint-disable-line no-unused-vars
     return {
       fetchState: FETCH_STATES.FETCH_SUCCESSFUL,
       ...props
     }
   },
-  [UNBOOK_SESSION_FAILURE]: function setUnbookSessionFailureActionHandler(state, {error}) {
+  [UNBOOK_SESSION_FAILURE]: function setUnbookSessionFailureActionHandler({items, error}) {
     return {
       fetchState: FETCH_STATES.FETCH_FAILED,
-      items: state.items,
+      items,
       error
     }
   }
 }
 
 export default function sessionReducer(state = initialState, {type, ...actionProps}) {
-  if (type in actionHandlers) return actionHandlers[type](state, actionProps)
+  if (type in actionHandlers) return actionHandlers[type](actionProps)
   return state
 }
 
@@ -99,9 +99,11 @@ export function fetchSessions(userId) {
 
 /* Unbook session asynchronous action handlers */
 
-function unbookSessionRequest() {
+function unbookSessionRequest(state) {
+  const {items} = state.sessions
   return {
-    type: UNBOOK_SESSION
+    type: UNBOOK_SESSION,
+    items
   }
 }
 
@@ -126,7 +128,7 @@ function unbookSessionFailure(state, {error}) {
 
 export function unbookSession(sessionId) {
   return function _unbookSession(dispatch, getState) {
-    dispatch(unbookSessionRequest())
+    dispatch(unbookSessionRequest(getState()))
     try {
       dispatch(unbookSessionSuccess(getState(), sessionId))
     } catch (err) {
