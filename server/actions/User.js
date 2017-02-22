@@ -31,7 +31,7 @@ export const addFacebookID = (userId, facebookId) => {
       { facebook_id: facebookId },
       { where: { user_id: userId } }
     ).then(result => {
-      console.log(result) 
+      console.log(result)
     }).catch(err => console.log(`Sequelize error: ${err}`))
   })
 }
@@ -42,11 +42,17 @@ export const addFacebookID = (userId, facebookId) => {
  */
 export const findUserByFacebookID = (facebookId) => {
   return User.findOne({
-    where: { facebook_id: facebookId } 
+    where: { facebook_id: facebookId }
   }).then(user => {
     user = user.get({plain:true})
-    return user.user_id 
+    return user.user_id
   }).catch(err => console.log(`Error finding User ID for ${facebook_id}: ${err}`))
+}
+
+export const facebookGetUser = async(req, res) => {
+  const {facebook_id} = req.params
+  const userId = await findUserByFacebookID(facebook_id)
+  res.json({userId})
 }
 
 /* login
@@ -85,7 +91,7 @@ export const login = async (username, password) => {
       })
     })
   } catch (err) {
-    console.log(`FETCH ERROR: ${err}`) 
+    console.log(`FETCH ERROR: ${err}`)
     return {err}
   }
 }
@@ -120,7 +126,7 @@ export const authorize = (req, res) => {
         return verifyJwt(id_token, (jwtErr, decoded) => {
           if (jwtErr) return jwtErr
           const {sub: user_id, email, picture, name} = decoded
-          res.json({user_id, email, picture, name}) 
+          res.json({user_id, email, picture, name})
         })
       }).catch(err => res.json(`Delegation error: ${err}`))
     }).catch(error => console.log(`Sequelize error: ${error}`))
@@ -155,7 +161,7 @@ export const auth0ManagementApiJwt = (scopes) => {
     },
     iat: new Date().valueOf(),
     jti: 'b75911da6844cbf4803f2ce293fb423e'
-  } 
+  }
   // TODO this should be asynchronous (i.e using a callback) but for some reason it simply returns undefined even though token is defined
   // ((err, token) => if (err) return err; return token)
   return generateJwt(

@@ -58,7 +58,7 @@ bot.dialog('/collectEntities', [
     const missingEntity = missingEntities.shift()
     session.dialogData.entities[missingEntity].value = results.response
     session.dialogData.missingEntities = missingEntities
-    missingEntities.length > 0 ? session.replaceDialog('/collectEntities', session.dialogData) : session.replaceDialog('/findSession', session.dialogData.entities) 
+    missingEntities.length > 0 ? session.replaceDialog('/collectEntities', session.dialogData) : session.replaceDialog('/findSession', session.dialogData.entities)
   }
 ])
 
@@ -130,5 +130,35 @@ bot.dialog('/bookSession', [
       .then(details => console.log('session', details))
       .catch(err => console.log(`Error booking session on chatbot: ${err}`))
     session.send('Session booked')
+  }
+])
+
+intents.matches('sessions.showall', [
+  async function (session, args) {
+    try {
+      const userId_response = await fetch(`http://${apiHost}:${apiPort}/user/facebook/10205942258634763`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      })
+      const {userId} = await userId_response.json()
+      const sessions_response = await fetch(`http://${apiHost}:${apiPort}/sessions/list/${userId}`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      })
+      const sessions = await sessions_response.json()
+      let cards = []
+      sessions.forEach(details => {
+        cards.push(new builder.HeroCard(session)
+          .title(details.title)
+          .subtitle(`${details.title} session in ${details.location} at ${details.datetime}`))
+      })
+      const msg = new builder.Message(session)
+        .attachmentLayout(builder.AttachmentLayout.carousel)
+        .attachments(cards)
+      session.send(msg)
+    } catch (err) {
+      console.log(err)
+      send.session('Something went wrong, sorry about that.')
+    }
   }
 ])
