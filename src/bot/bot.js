@@ -58,7 +58,8 @@ bot.dialog('/collectEntities', [
     const missingEntity = missingEntities.shift()
     session.dialogData.entities[missingEntity].value = results.response
     session.dialogData.missingEntities = missingEntities
-    missingEntities.length > 0 ? session.replaceDialog('/collectEntities', session.dialogData) : session.replaceDialog('/findSession', session.dialogData.entities)
+    if (missingEntities.length > 0) session.replaceDialog('/collectEntities', session.dialogData)
+    else session.replaceDialog('/findSession', session.dialogData.entities)
   }
 ])
 
@@ -106,7 +107,7 @@ bot.dialog('/findSession', [
             .title(data.title)
             .subtitle(`${data.title} session in ${data.location} at ${data.datetime}`)
             .images([
-                builder.CardImage.create(session, 'http://cache2.asset-cache.net/xt/467826952.jpg?v=1&g=fs2|0|editorial186|26|952&s=1&b=NA==')
+              builder.CardImage.create(session, 'http://cache2.asset-cache.net/xt/467826952.jpg?v=1&g=fs2|0|editorial186|26|952&s=1&b=NA==')
             ])
             .buttons([builder.CardAction.postBack(addDetailsToSession(session, {...data}, '10205942258634763'), 'Book this session', 'Book this session')]) // TODO facebookId needs to be obtained from session data
         ]);
@@ -129,7 +130,7 @@ bot.dialog('/bookSession', [
     }).then(response => response.json())
       .then(details => console.log('session', details))
       .catch(err => console.log(`Error booking session on chatbot: ${err}`))
-    session.send('Session booked')
+    session.send('Great, I have booked that session for you! Is there anything else I can help with?')
   }
 ])
 

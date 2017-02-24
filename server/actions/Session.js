@@ -60,11 +60,33 @@ export const list = async(req, res) => {
     })
     return session_ids
   }).catch(err => reject(err))
-  const getSessionDetails = (id) => {
-    return Session.findOne({
+  const getSessionDetails = async (id) => {
+    const sessionRating = await BookedSession.findOne({
+      where: { user_id, session_id: id }
+    }).then(details => {
+      details = details.get({ plain: true })
+      return details.rating
+    }).catch(err => console.log(err))
+    const sessionDetails = await Session.findOne({
       where: { id }
     }).then(session => session.get({ plain: true }))
+    return {...sessionDetails, rating: sessionRating}
   }
   const results = Promise.all(sessionIds.map(getSessionDetails))
   results.then(details => res.json(details))
+}
+
+/* GET /session/rate/:session_id/:user_id/:rating
+ * Rate a session
+ * TODO make sure only sessions which are in the past can be rated
+ */
+
+export const rate = async (req, res) => {
+  const {session_id, user_id, rating} = req.params
+  BookedSession.update(
+    { rating },
+    { where: { session_id, user_id } }
+  ).then(result => {
+    res.json({...result})
+  }).catch(err => res.json({err}))
 }

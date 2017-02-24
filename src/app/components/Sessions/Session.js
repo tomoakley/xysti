@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import cssModules from 'react-css-modules'
+import Rating from 'react-rating'
 import moment from 'moment'
+import Svg from 'app/components/icons/Svg'
 import styles from './session.scss'
 
 @cssModules(styles, {allowMultiple: true})
@@ -12,6 +14,16 @@ export default class Session extends Component {
     unbookSession: PropTypes.func
   }
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      ratingBtnHover: false,
+      sessionRating: this.props.details.rating
+    }
+    this.showRatingStars = this.showRatingStars.bind(this)
+    this.hideRatingStars = this.hideRatingStars.bind(this)
+  }
+
   _formatDatetime(datetime) {
     return moment(datetime).format('dddd D MMM HH:mm')
   }
@@ -20,8 +32,12 @@ export default class Session extends Component {
     return moment().isBefore(datetime)
   }
 
-  renderImage() {
-    return <div styleName="session__image"></div>
+  showRatingStars() {
+    this.setState({ ratingBtnHover: true })
+  }
+
+  hideRatingStars() {
+    this.setState({ ratingBtnHover: false })
   }
 
   renderDetails() {
@@ -62,8 +78,37 @@ export default class Session extends Component {
     return <a href="#" styleName="session__button" onClick={onClick}>Unbook</a>
   }
 
-  renderButton() {
+  renderImage() {
+    return <div styleName="session__image"></div>
+  }
 
+  renderRating() {
+    const {ratingBtnHover, sessionRating} = this.state
+    const {
+      details: {
+        id: sessionId
+      },
+      user: {
+        id: userId
+      }
+    } = this.props
+    const onChange = async (rating) => {
+      const ratingResponse = await fetch(`/api/session/rate/${sessionId}/${userId}/${rating}`, { // TODO this should be a redux action e.g rateSession()
+        method: 'GET',
+        headers: { Accept: 'application/json' }
+      })
+      const ratingJson = await ratingResponse.json()
+      if (ratingJson['0'] === 1) this.setState({ sessionRating: rating })
+    }
+    const starEmpty = <Svg type="Star" height="24" fill="#fff" />
+    const starFull = <Svg type="Star" height="24" fill="#444" />
+    const starRating = <Rating styleName="session__rating--stars-container" onChange={onChange} initialRate={sessionRating} readonly={sessionRating > 0} quiet={sessionRating > 0} empty={starEmpty} placeholder={starFull} full={starFull} />
+    const ratingButton = <a href="#" styleName="session__button">Rate Session</a>
+    return (
+      <div styleName="session__rating--container" onMouseEnter={this.showRatingStars} onMouseLeave={this.hideRatingStars}>
+        { (ratingBtnHover || !!(sessionRating > 0)) ? starRating : ratingButton }
+      </div>
+    )
   }
 
   render() {
@@ -72,7 +117,7 @@ export default class Session extends Component {
       <li styleName="session__list--session">
         {this.renderImage()}
         {this.renderDetails()}
-        { this._isSessionUpcoming(datetime) ? this.renderUnbookButton() : null}
+        { this._isSessionUpcoming(datetime) ? this.renderUnbookButton() : this.renderRating() }
       </li>
     )
   }

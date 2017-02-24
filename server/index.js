@@ -6,7 +6,7 @@ import SocketIo from 'socket.io'
 const RedisStore = require('connect-redis')(session)
 import config from '../src/config'
 import {authorize, login, linkAccount, auth0ManagementApiJwt, checkAuth, facebookGetUser} from './actions/User'
-import {find, book, list, remove} from './actions/Session'
+import {find, book, list, remove, rate} from './actions/Session'
 import configureAuth from './configureAuth'
 
 const app = express()
@@ -47,6 +47,7 @@ app.get('/user/checkAuth', checkAuth)
 app.get('/user/facebook/:facebook_id', facebookGetUser)
 app.post('/session/find', find)
 app.post('/session/book', book)
+app.get('/session/rate/:session_id/:user_id/:rating', rate)
 app.get('/sessions/list/:user_id', list)
 app.delete('/sessions/delete/:user_id/:session_id', remove)
 app.get('/jwt', (req, res) => {
