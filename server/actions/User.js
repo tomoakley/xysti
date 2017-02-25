@@ -2,7 +2,6 @@ import 'es6-promise'
 import 'isomorphic-fetch'
 import User from '../models/User'
 import {verifyJwt, generateJwt} from '../../src/utils/jwt'
-import {setCookieValue} from '../../src/utils/cookies'
 import urlFormat from '../../src/utils/urlFormat'
 
 /* getRefreshToken
@@ -44,9 +43,9 @@ export const findUserByFacebookID = (facebookId) => {
   return User.findOne({
     where: { facebook_id: facebookId }
   }).then(user => {
-    user = user.get({plain:true})
-    return user.user_id
-  }).catch(err => console.log(`Error finding User ID for ${facebook_id}: ${err}`))
+    const {user_id} = user.get({ plain: true })
+    return user_id // eslint-disable-line camelcase
+  }).catch(err => console.log(`Error finding User ID for ${facebookId}: ${err}`))
 }
 
 export const facebookGetUser = async(req, res) => {
@@ -84,7 +83,7 @@ export const login = async (username, password) => {
     return verifyJwt(id_token, (jwtErr, decoded) => {
       if (jwtErr) return jwtErr
       const {sub: user_id, email: emailAddress, picture, name, exp, iat, aud} = decoded
-      getRefreshToken(user_id, refresh_token)
+      addRefreshToken(user_id, refresh_token)
       return generateJwt({user_id, exp, iat, aud}, AUTH0_SECRET, true, (err, token) => {
         if (err) return {err}
         return {token, user_id, emailAddress, picture, name}
@@ -101,12 +100,11 @@ export const login = async (username, password) => {
  * TODO Needs refactoring as very ineffecient
  */
 export const authorize = (req, res) => {
-  const user_id = req.session.passport && req.session.passport.user ? req.session.passport.user : null
-  if (user_id) {
-    const {AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_SECRET} = process.env
+  const user_id = req.session.passport && req.session.passport.user ? req.session.passport.user : null // eslint-disable-line camelcase
+  if (user_id) { // eslint-disable-line camelcase
+    const {AUTH0_DOMAIN, AUTH0_CLIENT_ID} = process.env
     User.findOne({ where: {user_id} }).then(user => {
-      user = user.get({ plain: true })
-      const {refresh_token} = user
+      const {refresh_token} = user.get({ plain: true })
       return fetch(`https://${AUTH0_DOMAIN}/delegation`, {
         method: 'POST',
         headers: {
@@ -125,7 +123,7 @@ export const authorize = (req, res) => {
         const {id_token} = data
         return verifyJwt(id_token, (jwtErr, decoded) => {
           if (jwtErr) return jwtErr
-          const {sub: user_id, email, picture, name} = decoded
+          const {sub: user_id, email, picture, name} = decoded // eslint-disable-line no-shadow
           res.json({user_id, email, picture, name})
         })
       }).catch(err => res.json(`Delegation error: ${err}`))
@@ -141,6 +139,7 @@ export const authorize = (req, res) => {
  */
 export const linkAccount = (req, res) => {
   console.log('session', req.session)
+  console.log('res', res)
 }
 
 /* auth0ManagementApiJwt
@@ -197,6 +196,6 @@ export const getUserById = id => {
  * Return the session details if they exist
  */
 export const checkAuth = (req, res) => {
-  const user_id = req.session.passport && req.session.passport.user ? req.session.passport.user : null
+  const user_id = req.session.passport && req.session.passport.user ? req.session.passport.user : null // eslint-disable-line camelcase
   res.json({user_id})
 }

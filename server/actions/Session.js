@@ -25,15 +25,17 @@ export const book = async(req, res) => {
   const {title, location, datetime, facebookId} = req.body
   const sessionID = await Session.findOrCreate({
     where: { title, location, datetime }
-  }).spread((session, created) => {
-    session = session.get({ plain: true })
-    return session.id
+  }).spread(session => {
+    const {id} = session.get({ plain: true }) // eslint-disable-line no-param-reassign
+    return id
   })
   const userID = await findUserByFacebookID(facebookId)
   const bookedSession = await BookedSession.create({
     session_id: sessionID, user_id: userID
-  }).then((session, created) => session.get({ plain: true }))
-    .catch(err => {err})
+  }).then(session => session.get({ plain: true }))
+    .catch(err => {
+      return err
+    })
   res.json({...bookedSession})
 }
 
@@ -51,29 +53,28 @@ export const remove = async(req, res) => {
  */
 export const list = async(req, res) => {
   const {user_id} = req.params
-  const sessionIds = await BookedSession.findAll({
-    where: { user_id }
-  }).then(sessions => {
-    var session_ids = []
-    sessions.forEach(session => {
-      session_ids.push(session.session_id)
-    })
-    return session_ids
-  }).catch(err => reject(err))
-  const getSessionDetails = async (id) => {
-    const sessionRating = await BookedSession.findOne({
-      where: { user_id, session_id: id }
-    }).then(details => {
-      details = details.get({ plain: true })
-      return details.rating
-    }).catch(err => console.log(err))
-    const sessionDetails = await Session.findOne({
-      where: { id }
-    }).then(session => session.get({ plain: true }))
-    return {...sessionDetails, rating: sessionRating}
+  try {
+    const sessions = await BookedSession.findAll({ where: { user_id } })
+    const sessionIds = []
+    sessions.forEach(session => sessionIds.push(session.session_id))
+    const getSessionDetails = async (id) => {
+      const sessionRating = await BookedSession.findOne({
+        where: { user_id, session_id: id }
+      }).then(details => {
+        const {rating} = details.get({ plain: true })
+        return rating
+      }).catch(err => console.log(err))
+      const sessionDetails = await Session.findOne({
+        where: { id }
+      }).then(session => session.get({ plain: true }))
+      return {...sessionDetails, rating: sessionRating}
+    }
+    const results = Promise.all(sessionIds.map(getSessionDetails))
+    results.then(details => res.json(details))
+  } catch (err) {
+    console.log(err)
+    res.json({err})
   }
-  const results = Promise.all(sessionIds.map(getSessionDetails))
-  results.then(details => res.json(details))
 }
 
 /* GET /session/rate/:session_id/:user_id/:rating

@@ -1,19 +1,13 @@
 import express from 'express'
 import session from 'express-session'
 import bodyParser from 'body-parser'
-import http from 'http'
-import SocketIo from 'socket.io'
 const RedisStore = require('connect-redis')(session)
 import config from '../src/config'
-import {authorize, login, linkAccount, auth0ManagementApiJwt, checkAuth, facebookGetUser} from './actions/User'
+import {authorize, linkAccount, auth0ManagementApiJwt, checkAuth, facebookGetUser} from './actions/User'
 import {find, book, list, remove, rate} from './actions/Session'
 import configureAuth from './configureAuth'
 
 const app = express()
-const server = new http.Server(app)
-
-const io = new SocketIo(server);
-io.path('/ws');
 
 const {
   api: {
@@ -32,14 +26,14 @@ app.use(session({
 app.use(bodyParser.json())
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", 'http://localhost:3000')
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, X-AUTHENTICATION, X-IP, Content-Type, Accept")
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3000')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-AUTHENTICATION, X-IP, Content-Type, Accept')
   res.header('Access-Control-Allow-Credentials', true)
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
   next()
 })
 
-configureAuth(app, config)
+configureAuth(app)
 
 app.post('/user/authorize', authorize)
 app.post('/user/link', linkAccount)
@@ -55,32 +49,11 @@ app.get('/jwt', (req, res) => {
 })
 
 if (apiPort) {
-  const runnable = app.listen(apiPort, (err) => {
+  app.listen(apiPort, (err) => {
     if (err) console.error(err)
     console.info('----\n==> 🌎  Server is running on port %s', apiPort)
     console.info('==> 💻  Send requests to http://%s:%s', apiHost, apiPort)
   })
-
-  io.on('connection', (socket) => {
-
-    socket.on('history', () => {
-      for (let index = 0; index < bufferSize; index++) {
-        const msgNo = (messageIndex + index) % bufferSize;
-        const msg = messageBuffer[msgNo];
-        if (msg) {
-          socket.emit('msg', msg);
-        }
-      }
-    });
-
-    socket.on('msg', (data) => {
-      data.id = messageIndex;
-      messageBuffer[messageIndex % bufferSize] = data;
-      messageIndex++;
-      io.emit('msg', data);
-    });
-  });
-  io.listen(runnable);
 } else {
   console.error('==>     ERROR: No PORT environment variable has been specified');
 }

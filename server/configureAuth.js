@@ -1,17 +1,15 @@
 import passport from 'passport'
 import LocalStrategy from 'passport-local'
 import FacebookStrategy from 'passport-facebook'
-import {verifyJwt, generateJwt} from '../src/utils/jwt'
+import {verifyJwt} from '../src/utils/jwt'
 import {addRefreshToken, getUserById, auth0ManagementApiJwt, addFacebookID} from './actions/User'
 import 'isomorphic-fetch'
 
-const configureAuth = (app, config) => {
-
+const configureAuth = (app) => {
   app.use(passport.initialize())
   app.use(passport.session())
-
-  passport.use(new LocalStrategy(async function(username, password, done) {
-    const {AUTH0_CLIENT_ID, AUTH0_DOMAIN, AUTH0_SECRET} = process.env
+  passport.use(new LocalStrategy(async (username, password, done) => { // eslint-lint-disable func-names
+    const {AUTH0_CLIENT_ID, AUTH0_DOMAIN} = process.env
     try {
       const response = await fetch(`https://${AUTH0_DOMAIN}/oauth/ro`, {
         method: 'POST',
@@ -34,57 +32,55 @@ const configureAuth = (app, config) => {
       const {id_token, refresh_token} = data
       return verifyJwt(id_token, (jwtErr, decoded) => {
         if (jwtErr) return jwtErr
-        const {sub: user_id, email, picture, name, exp, iat, aud} = decoded
+        const {sub: user_id, email, picture, name} = decoded
         addRefreshToken(user_id, refresh_token)
         return done(null, {user_id, email, picture, name})
       })
     } catch (err) {
-      console.log(`FETCH ERROR: ${err}`) 
+      console.log(`FETCH ERROR: ${err}`)
       return done(null, false)
     }
   }))
 
   passport.use(new FacebookStrategy({
-      clientID: process.env.FACEBOOK_APP_ID,
-      clientSecret: process.env.FACEBOOK_APP_SECRET,
-      callbackURL: 'http://localhost:3030/user/link/facebook/return',
-      passReqToCallback: true
-    }, (req, accessToken, refreshToken, profile, done) => {
-      const {user: user_id} = req.session.passport
-      const token = auth0ManagementApiJwt(['read', 'update'])
-      const {AUTH0_DOMAIN} = process.env
-      return fetch(`https://${AUTH0_DOMAIN}/api/v2/users/${user_id}/identities`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          provider: 'facebook',
-          user_id: profile.id,
-        })
-      }).then(response => response.json())
-        .then(data => {
-          if (data.statusCode) {
-            console.error(`Error linking account ${user_id} to Facebook: ${data.message}`)
-            if (data.errorCode == 'identity_conflict') {
-              addFacebookID(user_id, profile.id)
-              return done(null, {user_id, facebook_id: profile.id}) 
-            }
-            return done(data.message, false) // return the error message
-          } else {
-            return data.some(identity => {
-              if (identity.provider == 'facebook') {
-                addFacebookID(user_id, profile.id)
-                return done(null, {user_id, facebook_id: identity.user_id}) 
-              } else {return false}
-            })
-            return done('empty provider', false) // shouldn't be able to get here, but if it does...
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: 'http://localhost:3030/user/link/facebook/return',
+    passReqToCallback: true
+  }, (req, accessToken, refreshToken, profile, done) => {
+    const {user: userId} = req.session.passport
+    const token = auth0ManagementApiJwt(['read', 'update'])
+    const {AUTH0_DOMAIN} = process.env
+    return fetch(`https://${AUTH0_DOMAIN}/api/v2/users/${userId}/identities`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        provider: 'facebook',
+        user_id: profile.id,
+      })
+    }).then(response => response.json())
+      .then(data => {
+        if (data.statusCode) {
+          console.error(`Error linking account ${userId} to Facebook: ${data.message}`)
+          if (data.errorCode === 'identity_conflict') {
+            addFacebookID(userId, profile.id)
+            return done(null, {userId, facebook_id: profile.id})
           }
+          return done(data.message, false) // return the error message
+        }
+        return data.some(identity => {
+          if (identity.provider === 'facebook') {
+            addFacebookID(userId, profile.id)
+            return done(null, {userId, facebook_id: identity.user_id}) // yes! it worked
+          }
+          return false
         })
-        .catch(err => console.log(`error linking facebook: ${err}`))
-      }
+      }).catch(err => console.log(`error linking facebook: ${err}`))
+    } // eslint-disable-line indent
   ))
 
   passport.serializeUser((user, done) => done(null, user.user_id))
@@ -93,7 +89,7 @@ const configureAuth = (app, config) => {
       const user = await getUserById(id)
       done(null, user)
     } catch (err) {
-      done(err, false) 
+      done(err, false)
     }
   })
 
@@ -106,10 +102,9 @@ const configureAuth = (app, config) => {
   app.get('/loginfailed', (req, res) => res.send('failed'))
 
   app.get('/user/link/facebook', passport.authenticate('facebook'))
-  app.get('/user/link/facebook/return', passport.authenticate('facebook', 
+  app.get('/user/link/facebook/return', passport.authenticate('facebook',
     { failureRedirect: '/loginfailed', successRedirect: '/login' }),
   )
-
 }
 
 export default configureAuth

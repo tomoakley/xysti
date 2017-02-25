@@ -135,19 +135,19 @@ bot.dialog('/bookSession', [
 ])
 
 intents.matches('sessions.showall', [
-  async function (session, args) {
+  async function(session, args) { // eslint-disable-line no-unused-vars, func-names
     try {
-      const userId_response = await fetch(`http://${apiHost}:${apiPort}/user/facebook/10205942258634763`, {
+      const userIdResponse = await fetch(`http://${apiHost}:${apiPort}/user/facebook/10205942258634763`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       })
-      const {userId} = await userId_response.json()
-      const sessions_response = await fetch(`http://${apiHost}:${apiPort}/sessions/list/${userId}`, {
+      const {userId} = await userIdResponse.json()
+      const sessionsResponse = await fetch(`http://${apiHost}:${apiPort}/sessions/list/${userId}`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       })
-      const sessions = await sessions_response.json()
-      let cards = []
+      const sessions = await sessionsResponse.json()
+      const cards = []
       sessions.forEach(details => {
         cards.push(new builder.HeroCard(session)
           .title(details.title)
@@ -159,7 +159,7 @@ intents.matches('sessions.showall', [
       session.send(msg)
     } catch (err) {
       console.log(err)
-      send.session('Something went wrong, sorry about that.')
+      session.send('Something went wrong, sorry about that.')
     }
   }
 ])
