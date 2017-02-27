@@ -1,23 +1,19 @@
 language: node_js
-
 node_js:
-  - "0.12"
-  - "5"
-  - "6"
-  - "6.1"
-  - "stable"
-
+- '0.12'
+- '5'
+- '6'
+- '6.1'
+- stable
 sudo: required
 dist: precise
 addons:
-    postgresql: "9.5"
+  postgresql: '9.5'
 services:
-    - postgresql
-
-before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-
+- postgresql
 script:
-  - npm run lint
-  - npm test
+- npm run lint
+- npm test
+notifications:
+  slack:
+    secure: XLTMgeJBfIIZPZWdKevoOAXkygrCqiJhrhOd0JGKwQH9JUbWqkcEGNzcvB6xty0ZZDZJ06VoCrC/fQhFRZ+sy3BCGn+zY7EOBW0In1FUSymFge1dY5NqBZMy/qnbd4eL4PkgKXbYa/r4AaOTw/S3byoe9Jfw2s8ieGWRZoJ9uOkmky2mXPoXptbualVVnqygzX9+9so6JTE1xxInptc6p+A7Vng25JJeAUTrA0osCQ8TfHGIx8ip3BapCzG+HqkRvhg+Yi5RR+6nqMWp6Ozfn3Gabu8Bu7hvc7+hWl3tV+1vPX+tC1/wo0XArzOOzE1lVexhg2k8504caqtq7JRHlP/PgBXoY8EGqYU8CPJ0O7lNhhSQTTpIqERt/6YKshjJg+ZcaEiej1JbFkwCkUV0H/um8y6kYjteyeHNaaoCVyDPTjCyQgGPy5hwfgP89vLxcNzUnLdQOtqGKpinkg7zqcMJBbgnNJ1ksVT/71x4G0ZgeY905YJPwOnBOhSBo1TE01SA0+J9N4WjALtHjkrUeYFU9tC7vB7923MdwJAL+Zj21GSZO4ozMdgWXJ5fPvyaj/R77dBlCnA+yaCt/qmlkiFnQuu2BbLD9DfODvbHlPb0j+OTRKvZW33ebBO2oezecldHXpxix1XjHfk1YrEgNQS9fArurcB/vPMVJEfgPso=
