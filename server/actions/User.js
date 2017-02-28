@@ -1,5 +1,6 @@
 import 'es6-promise'
 import 'isomorphic-fetch'
+import {path} from 'ramda'
 import User from '../models/User'
 import {verifyJwt, generateJwt} from '../../src/utils/jwt'
 import urlFormat from '../../src/utils/urlFormat'
@@ -100,10 +101,10 @@ export const login = async (username, password) => {
  * TODO Needs refactoring as very ineffecient
  */
 export const authorize = (req, res) => {
-  const user_id = req.session.passport && req.session.passport.user ? req.session.passport.user : null // eslint-disable-line camelcase
-  if (user_id) { // eslint-disable-line camelcase
+  const userId = path(['session', 'passport', 'user'], req)
+  if (userId) {
     const {AUTH0_DOMAIN, AUTH0_CLIENT_ID} = process.env
-    User.findOne({ where: {user_id} }).then(user => {
+    User.findOne({ where: {user_id: userId} }).then(user => {
       const {refresh_token} = user.get({ plain: true })
       return fetch(`https://${AUTH0_DOMAIN}/delegation`, {
         method: 'POST',
