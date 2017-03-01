@@ -1,8 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import cssModules from 'react-css-modules'
 import Rating from 'react-rating'
-import moment from 'moment'
 import Svg from 'app/components/icons/Svg'
+import {formatDatetime, isSessionUpcoming} from 'utils/datetime'
 import styles from './session.scss'
 
 @cssModules(styles, {allowMultiple: true})
@@ -24,14 +24,6 @@ export default class Session extends Component {
     this.hideRatingStars = this.hideRatingStars.bind(this)
   }
 
-  _formatDatetime(datetime) {
-    return moment(datetime).format('dddd D MMM HH:mm')
-  }
-
-  _isSessionUpcoming(datetime) {
-    return moment().isBefore(datetime)
-  }
-
   showRatingStars() {
     this.setState({ ratingBtnHover: true })
   }
@@ -44,7 +36,7 @@ export default class Session extends Component {
     const {
       details: {title, location, datetime}
     } = this.props
-    const formattedDate = this._formatDatetime(datetime)
+    const formattedDate = formatDatetime(datetime)
     return (
       <div styleName="session__details">
         <h3 styleName="session__details--title">{title}</h3>
@@ -117,7 +109,7 @@ export default class Session extends Component {
       <li styleName="session__list--session">
         {this.renderImage()}
         {this.renderDetails()}
-        { this._isSessionUpcoming(datetime) ? this.renderUnbookButton() : this.renderRating() }
+        { isSessionUpcoming(datetime) ? this.renderUnbookButton() : this.renderRating() }
       </li>
     )
   }

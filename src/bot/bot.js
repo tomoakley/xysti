@@ -2,7 +2,7 @@ import builder, {ChatConnector, UniversalBot, IntentDialog, EntityRecognizer} fr
 import 'isomorphic-fetch'
 import ApiAiRecognizer from 'api-ai-recognizer'
 import config from '../config'
-import parseDateTime from './utils/datetime/parse'
+import {formatDatetime, parseDateTime, getUpcomingSessions} from '../utils/datetime'
 
 const {
   api: {
@@ -101,14 +101,14 @@ bot.dialog('/findSession', [
       })
     }).then(response => response.json())
     .then(data => {
+      const {title, location} = data
+      const datetime = formatDatetime(data.datetime)
       const msg = new builder.Message(session)
         .attachments([
           new builder.HeroCard(session)
-            .title(data.title)
-            .subtitle(`${data.title} session in ${data.location} at ${data.datetime}`)
-            .images([
-              builder.CardImage.create(session, 'http://cache2.asset-cache.net/xt/467826952.jpg?v=1&g=fs2|0|editorial186|26|952&s=1&b=NA==')
-            ])
+            .title(title)
+            .subtitle(`Location: ${location}`)
+            .text(`Date: ${datetime}`)
             .buttons([builder.CardAction.postBack(addDetailsToSession(session, {...data}, '10205942258634763'), 'Book this session', 'Book this session')]) // TODO facebookId needs to be obtained from session data
         ]);
       builder.Prompts.text(session, msg)
@@ -147,16 +147,25 @@ intents.matches('sessions.showall', [
         headers: { 'Accept': 'application/json' }
       })
       const sessions = await sessionsResponse.json()
-      const cards = []
-      sessions.forEach(details => {
-        cards.push(new builder.HeroCard(session)
-          .title(details.title)
-          .subtitle(`${details.title} session in ${details.location} at ${details.datetime}`))
-      })
-      const msg = new builder.Message(session)
-        .attachmentLayout(builder.AttachmentLayout.carousel)
-        .attachments(cards)
-      session.send(msg)
+      if (sessions && sessions.length > 0) {
+        const upcoming = getUpcomingSessions(sessions)
+        const cards = []
+        upcoming.forEach(details => {
+          const {title, location} = details
+          const datetime = formatDatetime(details.datetime)
+          cards.push(new builder.HeroCard(session)
+            .title(title)
+            .subtitle(`Location: ${location}`)
+            .text(`Date: ${datetime}`)
+          )
+        })
+        const msg = new builder.Message(session)
+          .attachmentLayout(builder.AttachmentLayout.carousel)
+          .attachments(cards)
+        session.send(msg)
+      } else {
+        session.send('Hmm, looks like you have no upcoming sessions booked right now.')
+      }
     } catch (err) {
       console.log(err)
       session.send('Something went wrong, sorry about that.')

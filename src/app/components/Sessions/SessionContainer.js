@@ -1,9 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import cssModules from 'react-css-modules'
-import moment from 'moment'
-import {pipe, path, complement} from 'ramda'
 import SessionList from 'app/components/Sessions/SessionList'
 import styles from './session.scss'
+import {getPastSessions, getUpcomingSessions} from 'utils/datetime'
 
 @cssModules(styles, {allowMultiple: true, errorWhenNotFound: false})
 export default class SessionContainer extends Component {
@@ -20,19 +19,6 @@ export default class SessionContainer extends Component {
     this.refreshSessions = this.refreshSessions.bind(this)
   }
 
-  _getPastSessions(sessions) {
-    return sessions.filter(pipe(path(['datetime']), complement(this._isSessionUpcoming)))
-  }
-
-  _getUpcomingSessions(sessions) {
-    return sessions.filter(pipe(path(['datetime']), this._isSessionUpcoming))
-  }
-
-  _isSessionUpcoming(datetime) {
-    return moment().isBefore(datetime) // return TRUE - upcoming; FALSE - past
-  }
-
-
   refreshSessions(event) {
     const {
       user: {id},
@@ -44,7 +30,7 @@ export default class SessionContainer extends Component {
 
   renderUpcomingSessions() {
     const {unbookSession, user, sessions} = this.props
-    const upcomingSessions = sessions && sessions.length > 0 ? this._getUpcomingSessions(sessions) : null
+    const upcomingSessions = sessions && sessions.length > 0 ? getUpcomingSessions(sessions) : null
     return (
       <div>
         <div styleName="session__container--header display--flex flex--center-between">
@@ -58,7 +44,7 @@ export default class SessionContainer extends Component {
 
   renderPastSessions() {
     const {unbookSession, user, sessions} = this.props
-    const pastSessions = sessions && sessions.length > 0 ? this._getPastSessions(sessions) : null
+    const pastSessions = sessions && sessions.length > 0 ? getPastSessions(sessions) : null
     return (
       <div>
         <div styleName="session__container--header">
