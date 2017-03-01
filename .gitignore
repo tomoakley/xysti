@@ -6,6 +6,11 @@ logs
 *.log
 npm-debug.log*
 
+# build files
+static/dist
+webpack-assets.json
+webpack-stats.json
+
 # Vim files
 *.swp
 *.swo
