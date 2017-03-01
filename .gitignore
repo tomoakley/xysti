@@ -7,7 +7,7 @@ logs
 npm-debug.log*
 
 # build files
-static/dist
+static/dist/*
 webpack-assets.json
 webpack-stats.json
 
