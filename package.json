@@ -24,7 +24,7 @@
   ],
   "main": "bin/client.js",
   "scripts": {
-    "start": "concurrent --kill-others \"npm run start-prod\" \"npm run start-prod-api\"",
+    "start": "concurrent --kill-others \"npm run start-prod\" \"npm run start-prod-api\" \"npm run start-prod-bot\"",
     "start-prod": "better-npm-run start-prod",
     "start-prod-api": "better-npm-run start-prod-api",
     "build": "better-npm-run build",
@@ -45,18 +45,28 @@
     "start-prod": {
       "command": "node ./bin/client.js",
       "env": {
-        "NODE_PATH": "./src",
+        "NODE_PATH": "./src/app",
         "NODE_ENV": "production",
-        "PORT": 8080,
-        "API_PORT": 3030
+        "PORT": 80,
+        "API_PORT": 3030,
+        "BOT_PORT": 4000
       }
     },
     "start-prod-api": {
       "command": "node ./bin/api.js",
       "env": {
-        "NODE_PATH": "./api",
+        "NODE_PATH": "./server",
         "NODE_ENV": "production",
         "API_PORT": 3030
+      }
+    },
+    "start-prod-bot": {
+      "command": "node ./bin/bot.js",
+      "env": {
+        "NODE_PATH": "./src/bot",
+        "NODE_ENV": "production",
+        "API_PORT": 3030,
+        "BOT_PORT": 4000
       }
     },
     "start-dev": {
