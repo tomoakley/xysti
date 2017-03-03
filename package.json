@@ -27,6 +27,7 @@
     "start": "concurrent --kill-others \"npm run start-prod\" \"npm run start-prod-api\" \"npm run start-prod-bot\"",
     "start-prod": "better-npm-run start-prod",
     "start-prod-api": "better-npm-run start-prod-api",
+    "start-prod-bot": "better-npm-run start-prod-bot",
     "build": "better-npm-run build",
     "postinstall": "npm run build",
     "lint": "eslint -c .eslintrc src server",
@@ -45,9 +46,9 @@
     "start-prod": {
       "command": "node ./bin/client.js",
       "env": {
-        "NODE_PATH": "./src/app",
+        "NODE_PATH": "./src",
         "NODE_ENV": "production",
-        "PORT": 80,
+        "PORT": 8080,
         "API_PORT": 3030,
         "BOT_PORT": 4000
       }
@@ -63,7 +64,7 @@
     "start-prod-bot": {
       "command": "node ./bin/bot.js",
       "env": {
-        "NODE_PATH": "./src/bot",
+        "NODE_PATH": "./src",
         "NODE_ENV": "production",
         "API_PORT": 3030,
         "BOT_PORT": 4000
@@ -90,7 +91,7 @@
     "start-dev-bot": {
       "command": "node ./bin/bot.js",
       "env": {
-        "NODE_PATH": "./bot",
+        "NODE_PATH": "./src",
         "NODE_ENV": "development",
         "BOT_PORT": 4000,
         "PORT": 3000,
