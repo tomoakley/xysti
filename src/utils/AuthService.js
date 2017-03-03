@@ -70,19 +70,24 @@ export const getUserById = id => {
 } */
 
 
-export const reauthenticate = async() => {
-  try {
-    const response = await fetch('http://localhost:3030/user/authorize', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    })
-    return await response.json()
-  } catch (err) {
-    console.log(err)
-    return null
+export const reauthenticate = async(user) => {
+  if (!user.id) {
+    try {
+      const response = await fetch('http://localhost:3030/user/authorize', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+      const data = await response.json()
+      return data
+    } catch (err) {
+      console.log(err)
+      return null
+    }
+  } else {
+    return user
   }
 }

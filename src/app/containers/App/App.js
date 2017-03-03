@@ -15,12 +15,13 @@ import styles from './App.scss'
 
 @asyncConnect([{
   promise: ({ store: { dispatch, getState } }) => {
-    reauthenticate().then(data => {
+    reauthenticate(getState().user).then(data => {
       Promise.resolve(dispatch(receiveUserDetailsSuccess(data))) // TODO make this use fetchUserDetails instead of the insider function
     }).then(() => {
       const {
         user: {id}
       } = getState()
+      console.log('user id', id)
       if (id) {
         fetchSessionList(id).then(sessionList => Promise.resolve(dispatch(receiveSessionsSuccess(sessionList)))) // TODO same as above, use fetchSessions instead
       }

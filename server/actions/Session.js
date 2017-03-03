@@ -53,16 +53,22 @@ export const remove = async(req, res) => {
  */
 export const list = async(req, res) => {
   const {user_id} = req.params
+  const sessionIds = await BookedSession.findAll({
+    where: { user_id }
+  }).then(sessions => {
+    var session_ids = []
+    sessions.forEach(session => {
+      session_ids.push(session.session_id)
+    })
+    return session_ids
+  }).catch(err => reject(err))
   try {
-    const sessions = await BookedSession.findAll({ where: { user_id } })
-    const sessionIds = []
-    sessions.forEach(session => sessionIds.push(session.session_id))
     const getSessionDetails = async (id) => {
       const sessionRating = await BookedSession.findOne({
         where: { user_id, session_id: id }
       }).then(details => {
-        const {rating} = details.get({ plain: true })
-        return rating
+        details = details.get({ plain: true })
+        return details.rating
       }).catch(err => console.log(err))
       const sessionDetails = await Session.findOne({
         where: { id }
@@ -70,10 +76,12 @@ export const list = async(req, res) => {
       return {...sessionDetails, rating: sessionRating}
     }
     const results = Promise.all(sessionIds.map(getSessionDetails))
-    results.then(details => res.json(details))
+    results.then(details => {
+      console.log('details', details)
+      res.json(details)
+    }).catch(err => console.log(err))
   } catch (err) {
     console.log(err)
-    res.json({err})
   }
 }
 
