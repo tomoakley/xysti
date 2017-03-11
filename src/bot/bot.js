@@ -5,11 +5,8 @@ import config from '../config'
 import {formatDatetime, parseDateTime, getUpcomingSessions} from '../utils/datetime'
 
 const {
-  api: {
-    port: apiPort,
-    host: apiHost
-  }
-} = config
+    url: apiUrl
+} = config.api
 
 export const connector = new ChatConnector({
   appId: process.env.MICROSOFT_BOT_FRAMEWORK_ID,
@@ -88,7 +85,7 @@ bot.dialog('/findSession', [
       session.dialogData.sessionDetails = {...details, facebookId}
       return session
     }
-    fetch(`${apiHost}:${apiPort}/session/find`, {
+    fetch(`${apiUrl}/session/find`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -120,7 +117,7 @@ bot.dialog('/findSession', [
 bot.dialog('/bookSession', [
   (session, results) => {
     const {sessionDetails} = results
-    fetch(`${apiHost}:${apiPort}/session/book`, {
+    fetch(`${apiUrl}/session/book`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -137,12 +134,12 @@ bot.dialog('/bookSession', [
 intents.matches('sessions.showall', [
   async function(session, args) { // eslint-disable-line no-unused-vars, func-names
     try {
-      const userIdResponse = await fetch(`${apiHost}:${apiPort}/user/facebook/10205942258634763`, {
+      const userIdResponse = await fetch(`${apiUrl}/user/facebook/10205942258634763`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       })
       const {userId} = await userIdResponse.json()
-      const sessionsResponse = await fetch(`${apiHost}:${apiPort}/sessions/list/${userId}`, {
+      const sessionsResponse = await fetch(`${apiUrl}/sessions/list/${userId}`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       })

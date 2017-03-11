@@ -5,8 +5,7 @@ import {generateJwt} from './jwt'
 import config from 'config'
 
 const {
-  host: apiHost,
-  port: apiPort
+  url: apiUrl
 } = config.api
 
 export const getProfile = idToken => {
@@ -79,7 +78,7 @@ export const getUserById = id => {
 export const reauthenticate = async(user) => {
   if (!user.id) {
     try {
-      const response = await fetch(`${apiHost}:${apiPort}/user/authorize`, {
+      const response = await fetch(`${apiUrl}/user/authorize`, {
         method: 'POST',
         credentials: 'include',
         headers: {

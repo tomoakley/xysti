@@ -7,6 +7,7 @@ export default class Login extends Component {
 
   static propTypes = {
     user: PropTypes.object,
+    config: PropTypes.object,
     fetchUserDetails: PropTypes.func,
     removeUserDetails: PropTypes.func
   }
@@ -20,8 +21,11 @@ export default class Login extends Component {
   }
 
   onLoginSubmit(event) {
+    const {
+      url: apiUrl
+    } = this.props.config.api
     event.preventDefault()
-    fetch('https://api.xysti.co/login', {
+    fetch(`${apiUrl}/login`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
