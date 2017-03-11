@@ -21,7 +21,6 @@ import styles from './App.scss'
       const {
         user: {id}
       } = getState()
-      console.log('user id', id)
       if (id) {
         fetchSessionList(id).then(sessionList => Promise.resolve(dispatch(receiveSessionsSuccess(sessionList)))) // TODO same as above, use fetchSessions instead
       }

@@ -131,5 +131,6 @@ if (config.app.port) {
     console.info('==> 💻  Open http://%s:%s in a browser to view the app.', config.app.host, config.app.port);
   });
 } else {
+  console.log(config)
   console.error('==>     ERROR: No PORT environment variable has been specified');
 }

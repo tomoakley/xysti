@@ -88,7 +88,7 @@ bot.dialog('/findSession', [
       session.dialogData.sessionDetails = {...details, facebookId}
       return session
     }
-    fetch(`http://${apiHost}:${apiPort}/session/find`, {
+    fetch(`${apiHost}:${apiPort}/session/find`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -120,7 +120,7 @@ bot.dialog('/findSession', [
 bot.dialog('/bookSession', [
   (session, results) => {
     const {sessionDetails} = results
-    fetch(`http://${apiHost}:${apiPort}/session/book`, {
+    fetch(`${apiHost}:${apiPort}/session/book`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -137,12 +137,12 @@ bot.dialog('/bookSession', [
 intents.matches('sessions.showall', [
   async function(session, args) { // eslint-disable-line no-unused-vars, func-names
     try {
-      const userIdResponse = await fetch(`http://${apiHost}:${apiPort}/user/facebook/10205942258634763`, {
+      const userIdResponse = await fetch(`${apiHost}:${apiPort}/user/facebook/10205942258634763`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       })
       const {userId} = await userIdResponse.json()
-      const sessionsResponse = await fetch(`http://${apiHost}:${apiPort}/sessions/list/${userId}`, {
+      const sessionsResponse = await fetch(`${apiHost}:${apiPort}/sessions/list/${userId}`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       })

@@ -21,7 +21,7 @@ export default class Login extends Component {
 
   onLoginSubmit(event) {
     event.preventDefault()
-    fetch('/api/login', {
+    fetch('https://api.xysti.co/login', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

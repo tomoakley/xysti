@@ -14,17 +14,17 @@ const environment = {
 
 module.exports = Object.assign({
   app: {
-    host: process.env.HOST || 'localhost',
+    host: process.env.HOST || 'http://localhost',
     port: process.env.PORT,
     title: 'Xysti',
     description: 'On-demand sports and physical activity app'
   },
   bot: {
-    host: process.env.BOT_HOST || 'localhost',
+    host: process.env.BOT_HOST || 'http://localhost',
     port: process.env.BOT_PORT
   },
   api: {
-    host: process.env.API_HOST || 'localhost',
+    host: process.env.API_HOST || 'http://localhost',
     port: process.env.API_PORT
   }
 }, environment);

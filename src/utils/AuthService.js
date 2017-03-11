@@ -73,7 +73,7 @@ export const getUserById = id => {
 export const reauthenticate = async(user) => {
   if (!user.id) {
     try {
-      const response = await fetch('http://localhost:3030/user/authorize', {
+      const response = await fetch('/api/user/authorize', {
         method: 'POST',
         credentials: 'include',
         headers: {
