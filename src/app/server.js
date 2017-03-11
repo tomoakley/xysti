@@ -20,7 +20,7 @@ import createHistory from 'react-router/lib/createMemoryHistory';
 import {Provider} from 'react-redux';
 import getRoutes from './routes';
 
-const targetUrl = `http://${config.api.host}:${config.api.port}`
+const targetUrl = `${config.api.host}:${config.api.port}`
 const pretty = new PrettyError();
 const app = new Express();
 const server = new http.Server(app);

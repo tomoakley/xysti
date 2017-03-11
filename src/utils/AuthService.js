@@ -5,7 +5,7 @@ import {generateJwt} from './jwt'
 import config from 'config'
 
 const {
-  api: apiHost,
+  host: apiHost,
   port: apiPort
 } = config.api
 
