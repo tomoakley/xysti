@@ -2,6 +2,12 @@ import 'es6-promise'
 import 'isomorphic-fetch'
 import urlFormat from './urlFormat'
 import {generateJwt} from './jwt'
+import config from 'config'
+
+const {
+  api: apiHost,
+  port: apiPort
+} = config.api
 
 export const getProfile = idToken => {
   return fetch(`${process.env.AUTH0_DOMAIN}/tokeninfo`, {
@@ -73,7 +79,7 @@ export const getUserById = id => {
 export const reauthenticate = async(user) => {
   if (!user.id) {
     try {
-      const response = await fetch('/api/user/authorize', {
+      const response = await fetch(`${apiHost}:${apiPort}/user/authorize`, {
         method: 'POST',
         credentials: 'include',
         headers: {
