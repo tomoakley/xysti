@@ -111,10 +111,9 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin(/webpack-stats\.json$/),
     new webpack.DefinePlugin({
-      'process.env': Object.keys(process.env).reduce(function(o, k) {
-        o[k] = JSON.stringify(process.env[k]);
-        return o;
-      }, {}),
+      'process.env': {
+        NODE_ENV: JSON.stringify('development')
+      },
       __CLIENT__: true,
       __SERVER__: false,
       __DEVELOPMENT__: true,
