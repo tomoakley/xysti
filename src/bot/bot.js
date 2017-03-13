@@ -53,7 +53,7 @@ bot.on('conversationUpdate', function (message) {
                 address.user = identity;
                 var reply = new builder.Message()
                         .address(address)
-                        .text(`Hey ${identity.name}, I'm Xysti. I'm your personal assistant for helping you find sports sessions and facilities. Ask me "where can I play {sport} tomorrow afternoon in {location}" to try me out.`);
+                        .text(`Hey, ${identity.name}, I'm Xysti. I'm you personal assistant for helping you find sports sessions and facilities. Ask me "where can I play {sport} tomorrow afternoon in {location}" to try me out.`);
                 bot.send(reply);
             }
         });
@@ -104,10 +104,10 @@ intents.matches('session.query', [
 
 bot.dialog('/findSession', [
   (session, args) => {
+    console.log('session details', session)
     session.sendTyping();
     const {sport, location, date, time} = args
     const {
-      id: userId,
       name
     } = session.message.user
     const datetime = parseDateTime(date.value, time.value)
@@ -138,7 +138,7 @@ bot.dialog('/findSession', [
             .text(`Date: ${datetime}`)
             .buttons([builder.CardAction.postBack(addDetailsToSession(session, {...data}, userId), 'Book this session', 'Book this session')]) // TODO facebookId needs to be obtained from session data
         ]);
-      session.send(`I found this for you, ${name}:`)
+      session.send(`I found this for you, ${name}`)
       builder.Prompts.text(session, msg)
     }).catch(err => console.log(`ERROR: ${err}`))
   },

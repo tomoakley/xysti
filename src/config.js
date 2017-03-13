@@ -22,7 +22,8 @@ module.exports = Object.assign({
   },
   bot: {
     host: process.env.BOT_HOST,
-    port: process.env.BOT_PORT
+    port: process.env.BOT_PORT,
+    url: process.env.NODE_ENV === 'production' ? `https://${process.env.BOT_HOST}` : `https://${process.env.BOT_HOST}:${process.env.BOT_PORT}`,
   },
   api: {
     host: process.env.API_HOST,
