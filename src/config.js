@@ -16,7 +16,7 @@ module.exports = Object.assign({
   app: {
     host: process.env.HOST,
     port: process.env.PORT,
-    url: process.env.NODE_ENV === 'production' ? `https://${process.env.HOST}` : `http://${process.env.HOST}:${process.env.PORT}`
+    url: process.env.NODE_ENV === 'production' ? `https://${process.env.HOST}` : `http://${process.env.HOST}:${process.env.PORT}`,
     title: 'Xysti',
     description: 'On-demand sports and physical activity app'
   },
