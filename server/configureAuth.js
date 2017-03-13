@@ -9,8 +9,9 @@ import {addRefreshToken, getUserById, auth0ManagementApiJwt, addFacebookID} from
 
 const configureAuth = (app) => {
   const {
-    url: apiUrl
-  } = config.api
+    api: {url: apiUrl},
+    app: {url: appUrl}
+  } = config
   app.use(passport.initialize())
   app.use(passport.session())
   passport.use(new LocalStrategy(async (username, password, done) => { // eslint-lint-disable func-names
@@ -103,7 +104,7 @@ const configureAuth = (app) => {
     (req, res) => res.json(req.user)
   )
 
-  app.get('/login', (req, res) => res.redirect('http://localhost:3000/profile'))
+  app.get('/login', (req, res) => res.redirect(`${appUrl}/profile`))
   app.get('/loginfailed', (req, res) => res.send('failed'))
 
   app.get('/user/link/facebook', passport.authenticate('facebook'))
