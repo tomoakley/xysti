@@ -104,7 +104,8 @@ intents.matches('session.query', [
 
 bot.dialog('/findSession', [
   (session, args) => {
-    console.log('session details', session)
+    console.log('sender', session.message.sourceEvent.sender)
+    console.log('user', session.message.address.user)
     session.sendTyping();
     const {sport, location, date, time} = args
     const {
