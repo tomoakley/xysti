@@ -17,7 +17,7 @@ export default class ProfilePage extends Component {
       <p>
         Hi, {user.email}.
         <button onClick={this.props.logout}>Logout?</button>
-        <a href={`${apiUrl}/api/user/link/facebook`}>Connect to facebook</a>
+        <a href={`${apiUrl}/user/link/facebook`}>Connect to facebook</a>
       </p>
     )
   }

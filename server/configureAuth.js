@@ -73,14 +73,14 @@ const configureAuth = (app) => {
           console.error(`Error linking account ${userId} to Facebook: ${data.message}`)
           if (data.errorCode === 'identity_conflict') {
             addFacebookID(userId, profile.id)
-            return done(null, {userId, facebook_id: profile.id})
+            return done(null, {id: userId, facebook_id: profile.id})
           }
-          return done(data.message, false) // return the error message
+          return done(null, {id: userId}) // return the error message
         }
         return data.some(identity => {
           if (identity.provider === 'facebook') {
             addFacebookID(userId, profile.id)
-            return done(null, {userId, facebook_id: identity.user_id}) // yes! it worked
+            return done(null, {id: userId, facebook_id: identity.user_id}) // yes! it worked
           }
           return false
         })
