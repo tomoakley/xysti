@@ -6,12 +6,13 @@ import ProfilePage from 'app/components/Profile/Profile'
 import {removeUserDetails} from 'app/redux/modules/user'
 
 export default connect(
-  pick(['user']), {removeUserDetails}
+  pick(['user', 'config']), {removeUserDetails}
 )(
   class Profile extends Component {
 
     static propTypes = {
       user: PropTypes.object,
+      config: PropTypes.object,
       removeUserDetails: PropTypes.func
     }
 
@@ -20,7 +21,7 @@ export default connect(
         <div>
           <Helmet title="Profile"/>
           <h1>Profile</h1>
-          <ProfilePage user={this.props.user} logout={this.props.removeUserDetails} />
+          <ProfilePage user={this.props.user} config={this.props.config} logout={this.props.removeUserDetails} />
         </div>
       )
     }

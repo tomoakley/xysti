@@ -36,6 +36,30 @@ bot.dialog('/help', [(session) => {
 
 bot.dialog('/', intents) // pass all messages through api.ai
 
+bot.on('conversationUpdate', function (message) {
+    if (message.membersAdded) {
+        message.membersAdded.forEach(function (identity) {
+            if (identity.id == message.address.bot.id) {
+               // do nothing
+            } else {
+                // User is joining conversation
+                // - For WebChat channel this will be sent when user sends first message.
+                // - When a user joins a conversation the address.user field is often for
+                //   essentially a system account so to ensure we're targeting the right
+                //   user we can tweek the address object to reference the joining user.
+                // - If we wanted to send a private message to teh joining user we could
+                //   delete the address.conversation field from the cloned address.
+                var address = Object.create(message.address);
+                address.user = identity;
+                var reply = new builder.Message()
+                        .address(address)
+                        .text(`Hey ${identity.name}, I'm Xysti. I'm your personal assistant for helping you find sports sessions and facilities. Ask me "where can I play {sport} tomorrow afternoon in {location}" to try me out.`);
+                bot.send(reply);
+            }
+        });
+    }
+});
+
 const getEntities = (entities) => {
   const missingEntities = []
   Object.keys(entities).forEach(name => !entities[name].value ? missingEntities.push(name) : null)
@@ -62,7 +86,7 @@ bot.dialog('/collectEntities', [
 
 intents.matches('session.query', [
   (session, args) => {
-    console.log(process.env.APIAI_API_KEY)
+    session.sendTyping();
     const sport = EntityRecognizer.findEntity(args.entities, 'sport')
     const location = EntityRecognizer.findEntity(args.entities, 'geo-city')
     const date = EntityRecognizer.findEntity(args.entities, 'date')
@@ -80,7 +104,12 @@ intents.matches('session.query', [
 
 bot.dialog('/findSession', [
   (session, args) => {
+    session.sendTyping();
     const {sport, location, date, time} = args
+    const {
+      id: userId,
+      name
+    } = session.message.user
     const datetime = parseDateTime(date.value, time.value)
     const addDetailsToSession = (session, details, facebookId) => { // eslint-disable-line no-shadow
       session.dialogData.sessionDetails = {...details, facebookId}
@@ -107,8 +136,9 @@ bot.dialog('/findSession', [
             .title(title)
             .subtitle(`Location: ${location}`)
             .text(`Date: ${datetime}`)
-            .buttons([builder.CardAction.postBack(addDetailsToSession(session, {...data}, '10205942258634763'), 'Book this session', 'Book this session')]) // TODO facebookId needs to be obtained from session data
+            .buttons([builder.CardAction.postBack(addDetailsToSession(session, {...data}, userId), 'Book this session', 'Book this session')]) // TODO facebookId needs to be obtained from session data
         ]);
+      session.send(`I found this for you, ${name}:`)
       builder.Prompts.text(session, msg)
     }).catch(err => console.log(`ERROR: ${err}`))
   },
@@ -118,6 +148,7 @@ bot.dialog('/findSession', [
 bot.dialog('/bookSession', [
   (session, results) => {
     const {sessionDetails} = results
+    const {name} = session.message.user
     fetch(`${apiUrl}/session/book`, {
       method: 'POST',
       headers: {
@@ -128,14 +159,14 @@ bot.dialog('/bookSession', [
     }).then(response => response.json())
       .then(details => console.log('session', details))
       .catch(err => console.log(`Error booking session on chatbot: ${err}`))
-    session.send('Great, I have booked that session for you! Is there anything else I can help with?')
+    session.send(`Great choice, ${name}! I have booked that session for you! Is there anything else I can help with?`)
   }
 ])
 
 intents.matches('sessions.showall', [
   async function(session, args) { // eslint-disable-line no-unused-vars, func-names
     try {
-      const userIdResponse = await fetch(`${apiUrl}/user/facebook/10205942258634763`, {
+      const userIdResponse = await fetch(`${apiUrl}/user/facebook/default-user`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       })

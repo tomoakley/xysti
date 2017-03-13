@@ -1,11 +1,16 @@
+import 'isomorphic-fetch'
 import passport from 'passport'
 import LocalStrategy from 'passport-local'
 import FacebookStrategy from 'passport-facebook'
+import config from '../src/config'
 import {verifyJwt} from '../src/utils/jwt'
 import {addRefreshToken, getUserById, auth0ManagementApiJwt, addFacebookID} from './actions/User'
-import 'isomorphic-fetch'
+
 
 const configureAuth = (app) => {
+  const {
+    url: apiUrl
+  } = config.api
   app.use(passport.initialize())
   app.use(passport.session())
   passport.use(new LocalStrategy(async (username, password, done) => { // eslint-lint-disable func-names
@@ -45,7 +50,7 @@ const configureAuth = (app) => {
   passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: 'http://localhost:3030/user/link/facebook/return',
+    callbackURL: `${apiUrl}/user/link/facebook/return`,
     passReqToCallback: true
   }, (req, accessToken, refreshToken, profile, done) => {
     const {user: userId} = req.session.passport
