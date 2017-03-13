@@ -33,6 +33,7 @@ export default connect(
   pick(['user']), {}
 )(
   class App extends Component {
+
     static propTypes = {
       children: PropTypes.object.isRequired,
       user: PropTypes.object,

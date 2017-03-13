@@ -102,6 +102,7 @@ export const login = async (username, password) => {
  */
 export const authorize = (req, res) => {
   const userId = path(['session', 'passport', 'user'], req)
+  console.log('session', req.session)
   if (userId) {
     const {AUTH0_DOMAIN, AUTH0_CLIENT_ID} = process.env
     User.findOne({ where: {user_id: userId} }).then(user => {
@@ -124,8 +125,8 @@ export const authorize = (req, res) => {
         const {id_token} = data
         return verifyJwt(id_token, (jwtErr, decoded) => {
           if (jwtErr) return jwtErr
-          const {sub: user_id, email, picture, name} = decoded // eslint-disable-line no-shadow
-          res.json({user_id, email, picture, name})
+          const {sub: id, email, picture, name} = decoded // eslint-disable-line no-shadow
+          res.json({id, email, picture, name})
         })
       }).catch(err => res.json(`Delegation error: ${err}`))
     }).catch(error => console.log(`Sequelize error: ${error}`))

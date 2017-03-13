@@ -1,8 +1,12 @@
 import 'isomorphic-fetch'
+import config from 'config'
 
 export const fetchSessionList = async(id) => {
+  const {
+    url: apiUrl
+  } = config.api
   try {
-    const response = await fetch(`/api/sessions/list/${id}`, {
+    const response = await fetch(`${apiUrl}/sessions/list/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

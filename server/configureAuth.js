@@ -32,9 +32,9 @@ const configureAuth = (app) => {
       const {id_token, refresh_token} = data
       return verifyJwt(id_token, (jwtErr, decoded) => {
         if (jwtErr) return jwtErr
-        const {sub: user_id, email, picture, name} = decoded
-        addRefreshToken(user_id, refresh_token)
-        return done(null, {user_id, email, picture, name})
+        const {sub: id, email, picture, name} = decoded
+        addRefreshToken(id, refresh_token)
+        return done(null, {id, email, picture, name})
       })
     } catch (err) {
       console.log(`FETCH ERROR: ${err}`)
@@ -83,7 +83,7 @@ const configureAuth = (app) => {
     } // eslint-disable-line indent
   ))
 
-  passport.serializeUser((user, done) => done(null, user.user_id))
+  passport.serializeUser((user, done) => done(null, user.id))
   passport.deserializeUser(async(id, done) => {
     try {
       const user = await getUserById(id)

@@ -8,6 +8,7 @@ var assetsPath = path.resolve(__dirname, '../static/dist');
 var host = (process.env.HOST || 'localhost');
 var port = (+process.env.PORT + 1) || 3001;
 
+require('dotenv').config();
 const NODE_ENV = process.env.NODE_ENV
 
 // https://github.com/halt-hammerzeit/webpack-isomorphic-tools
@@ -112,12 +113,14 @@ module.exports = {
     new webpack.IgnorePlugin(/webpack-stats\.json$/),
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('development')
+        NODE_ENV: JSON.stringify('development'),
+        API_HOST: JSON.stringify(process.env.API_HOST),
+        API_PORT: JSON.stringify(process.env.API_PORT)
       },
       __CLIENT__: true,
       __SERVER__: false,
-      __DEVELOPMENT__: true,
-      __DEVTOOLS__: true // <-------- DISABLE redux-devtools HERE
+      __DEVELOPMENT__: false,
+      __DEVTOOLS__: false
     }),
     new webpack.IgnorePlugin(/^mock-firmata$/),
     new webpack.ContextReplacementPlugin(/bindings$/, /mysql$/, /^$/),

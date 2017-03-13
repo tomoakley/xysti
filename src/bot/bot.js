@@ -62,6 +62,7 @@ bot.dialog('/collectEntities', [
 
 intents.matches('session.query', [
   (session, args) => {
+    console.log(process.env.APIAI_API_KEY)
     const sport = EntityRecognizer.findEntity(args.entities, 'sport')
     const location = EntityRecognizer.findEntity(args.entities, 'geo-city')
     const date = EntityRecognizer.findEntity(args.entities, 'date')

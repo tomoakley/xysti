@@ -76,6 +76,7 @@ export const getUserById = id => {
 
 
 export const reauthenticate = async(user) => {
+  console.log(apiUrl)
   if (!user.id) {
     try {
       const response = await fetch(`${apiUrl}/user/authorize`, {

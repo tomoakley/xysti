@@ -20,6 +20,10 @@ export default class Html extends Component {
     store: PropTypes.object
   }
 
+  componentDidMount() {
+    console.log('html mounted')
+  }
+
   render() {
     const {assets, component, store} = this.props;
     const content = component ? ReactDOM.renderToString(component) : '';

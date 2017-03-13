@@ -9,7 +9,6 @@ import cookieParser from 'cookie-parser'
 import httpProxy from 'http-proxy';
 import path from 'path';
 import createStore from './redux/create';
-import ApiClient from './helpers/ApiClient';
 import Html from './helpers/Html';
 import PrettyError from 'pretty-error';
 import http from 'http';
@@ -20,7 +19,6 @@ import createHistory from 'react-router/lib/createMemoryHistory';
 import {Provider} from 'react-redux';
 import getRoutes from './routes';
 
-const targetUrl = `${config.api.host}:${config.api.port}`
 const pretty = new PrettyError();
 const app = new Express();
 const server = new http.Server(app);
@@ -43,9 +41,8 @@ app.use((req, res) => {
     // hot module replacement is enabled in the development env
     webpackIsomorphicTools.refresh();
   }
-  const client = new ApiClient(req);
   const memoryHistory = createHistory(req.originalUrl);
-  const store = createStore({config}, memoryHistory, client);
+  const store = createStore({config}, memoryHistory);
   const history = syncHistoryWithStore(memoryHistory, store);
 
   function hydrateOnClient() {
@@ -59,14 +56,14 @@ app.use((req, res) => {
   }
 
   match({ history, routes: getRoutes(store), location: req.originalUrl }, (error, redirectLocation, renderProps) => {
+    console.log('redirect', redirectLocation)
     if (redirectLocation) {
-      res.redirect(redirectLocation.pathname + redirectLocation.search);
     } else if (error) {
       console.error('ROUTER ERROR:', pretty.render(error));
       res.status(500);
       hydrateOnClient();
     } else if (renderProps) {
-      loadOnServer({...renderProps, store, helpers: {client}}).then(() => {
+      loadOnServer({...renderProps, store}).then(() => {
         const component = (
           <Provider store={store} key="provider">
             <ReduxAsyncConnect {...renderProps} />
