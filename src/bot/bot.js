@@ -1,5 +1,5 @@
 import builder, {ChatConnector, UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
-import {path} from 'ramda'
+import {path, isEmpty} from 'ramda'
 import 'isomorphic-fetch'
 import ApiAiRecognizer from 'api-ai-recognizer'
 import config from '../config'
@@ -134,15 +134,16 @@ bot.dialog('/findSession', [
       const cards = []
       opportunities.forEach(opportunity => {
         const {title, address, website, id} = opportunity
+        const buttons = [
+          builder.CardAction.postBack(addDetailsToSession(session, {opportunityId: id, datetime: datetime.from}, '10205942258634763'), 'Book this session', 'Book this session'),
+          builder.CardAction.openUrl(session, `https://www.google.co.uk/maps?hl=en&q=${address}`, 'View on map')
+        ]
+        !isEmpty(website) ? buttons.push(builder.CardAction.openUrl(session, website, "Go to website")) : null
         cards.push(new builder.HeroCard(session)
           .title(title)
           .subtitle(`Address: ${address}`)
           .text(`Date: ${formatDatetime(datetime)}`)
-          .buttons([
-            builder.CardAction.postBack(addDetailsToSession(session, {opportunityId: id, datetime: datetime.from}, '10205942258634763'), 'Book this session', 'Book this session'),
-            builder.CardAction.openUrl(session, website, "Go to website"),
-            builder.CardAction.openUrl(session, `https://www.google.co.uk/maps?hl=en&q=${address}`, 'View on map')
-          ]) // TODO facebookId needs to be obtained from session data
+          .buttons(buttons) // TODO facebookId needs to be obtained from session data
         )
       })
       const carousel = new builder.Message(session)
@@ -170,11 +171,13 @@ bot.dialog('/bookSession', [
       .then(details => console.log('session', details))
       .catch(err => console.log(`Error booking session on chatbot: ${err}`))
     session.send(`Great choice, ${name}! I have booked that session for you. Is there anything else I can help with?`)
+    session.endDialog();
   }
 ])
 
 intents.matches('sessions.showall', [
   async function(session, args) { // eslint-disable-line no-unused-vars, func-names
+    const {name} = session.message.user
     try {
       const userIdResponse = await fetch(`${apiUrl}/user/facebook/default-user`, {
         method: 'GET',
@@ -202,6 +205,8 @@ intents.matches('sessions.showall', [
           .attachmentLayout(builder.AttachmentLayout.carousel)
           .attachments(cards)
         session.send(msg)
+        session.send(`You've got these coming up soon, ${name}. Is there anything else I can help with?`)
+        session.endDialog()
       } else {
         session.send('Hmm, looks like you have no upcoming sessions booked right now.')
       }
