@@ -16,6 +16,7 @@ export default class Session extends Component {
 
   constructor(props) {
     super(props)
+    console.log('session details', props.details)
     this.state = {
       ratingBtnHover: false,
       sessionRating: this.props.details.rating
@@ -34,14 +35,14 @@ export default class Session extends Component {
 
   renderDetails() {
     const {
-      details: {title, location, datetime}
+      details: {title, address, datetime}
     } = this.props
     const formattedDate = formatDatetime(datetime)
     return (
       <div styleName="session__details">
         <h3 styleName="session__details--title">{title}</h3>
         <span styleName="display--block">{formattedDate}</span>
-        <span styleName="display--block">{location}</span>
+        <span styleName="display--block">{address}</span>
       </div>
     )
   }

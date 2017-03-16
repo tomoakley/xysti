@@ -120,7 +120,7 @@ module.exports = {
       __CLIENT__: true,
       __SERVER__: false,
       __DEVELOPMENT__: false,
-      __DEVTOOLS__: false
+      __DEVTOOLS__: true
     }),
     new webpack.IgnorePlugin(/^mock-firmata$/),
     new webpack.ContextReplacementPlugin(/bindings$/, /mysql$/, /^$/),

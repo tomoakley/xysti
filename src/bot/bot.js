@@ -1,8 +1,10 @@
 import builder, {ChatConnector, UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
+import {path} from 'ramda'
 import 'isomorphic-fetch'
 import ApiAiRecognizer from 'api-ai-recognizer'
 import config from '../config'
-import {formatDatetime, parseDateTime, getUpcomingSessions} from '../utils/datetime'
+import {formatDatetime, parseDateTime, getUpcomingSessions} from 'utils/datetime'
+import geocodeLocation from 'utils/geocodeLocation'
 
 const {
     url: apiUrl
@@ -103,9 +105,7 @@ intents.matches('session.query', [
 ])
 
 bot.dialog('/findSession', [
-  (session, args) => {
-    console.log('sender', session.message.sourceEvent.sender)
-    console.log('user', session.message.address.user)
+  async (session, args) => {
     session.sendTyping();
     const {sport, location, date, time} = args
     const {
@@ -116,6 +116,8 @@ bot.dialog('/findSession', [
       session.dialogData.sessionDetails = {...details, facebookId}
       return session
     }
+    const geoLocation = await geocodeLocation(location.value)
+    const {lat, lng} = path(['results', 0, 'geometry', 'location'], geoLocation)
     fetch(`${apiUrl}/session/find`, {
       method: 'POST',
       headers: {
@@ -124,23 +126,30 @@ bot.dialog('/findSession', [
       },
       body: JSON.stringify({
         title: sport.value,
-        location: location.value,
-        datetime: datetime.from
+        lat, lng,
       })
     }).then(response => response.json())
     .then(data => {
-      const {title, location} = data
-      const datetime = formatDatetime(data.datetime)
-      const msg = new builder.Message(session)
-        .attachments([
-          new builder.HeroCard(session)
-            .title(title)
-            .subtitle(`Location: ${location}`)
-            .text(`Date: ${datetime}`)
-            .buttons([builder.CardAction.postBack(addDetailsToSession(session, {...data}, userId), 'Book this session', 'Book this session')]) // TODO facebookId needs to be obtained from session data
-        ]);
-      session.send(`I found this for you, ${name}`)
-      builder.Prompts.text(session, msg)
+      const {opportunities} = data
+      const cards = []
+      opportunities.forEach(opportunity => {
+        const {title, address, website, id} = opportunity
+        cards.push(new builder.HeroCard(session)
+          .title(title)
+          .subtitle(`Address: ${address}`)
+          .text(`Date: ${formatDatetime(datetime)}`)
+          .buttons([
+            builder.CardAction.postBack(addDetailsToSession(session, {opportunityId: id, datetime: datetime.from}, '10205942258634763'), 'Book this session', 'Book this session'),
+            builder.CardAction.openUrl(session, website, "Go to website"),
+            builder.CardAction.openUrl(session, `https://www.google.co.uk/maps?hl=en&q=${address}`, 'View on map')
+          ]) // TODO facebookId needs to be obtained from session data
+        )
+      })
+      const carousel = new builder.Message(session)
+        .attachmentLayout(builder.AttachmentLayout.carousel)
+        .attachments(cards)
+      session.send(`I found ${opportunities.length > 1 ? 'these' : 'this'} for you, ${name}`)
+      builder.Prompts.text(session, carousel)
     }).catch(err => console.log(`ERROR: ${err}`))
   },
   (session, args) => session.replaceDialog('/bookSession', session.dialogData) // eslint-disable-line no-unused-vars
@@ -160,7 +169,7 @@ bot.dialog('/bookSession', [
     }).then(response => response.json())
       .then(details => console.log('session', details))
       .catch(err => console.log(`Error booking session on chatbot: ${err}`))
-    session.send(`Great choice, ${name}! I have booked that session for you! Is there anything else I can help with?`)
+    session.send(`Great choice, ${name}! I have booked that session for you. Is there anything else I can help with?`)
   }
 ])
 

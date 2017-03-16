@@ -1,20 +1,39 @@
 import 'es6-promise'
 import 'isomorphic-fetch'
+import {path} from 'ramda'
 import Session from '../models/Session'
 import BookedSession from '../models/BookedSession'
 import {findUserByFacebookID} from './User'
+import urlFormat from '../../src/utils/urlFormat'
 
 /* POST /sessions/find/
  * Find sessions in the locality
  * Body: title, location, datetime
  * TODO change this to a GET request
  */
-export const find = (req, res) => {
-  const {title, location, datetime} = req.body
-  // right now this is just going to return the same params as above
-  // soon I will change it to use Google Places API or similar ({imin}!) to find a gym/leisure centre nearby
-  // also need to figure out how to get appropriate images. Getty Images API?
-  res.json({title, location, datetime})
+export const find = async (req, res) => {
+  const {title, lat, lng} = req.body
+  const activity = title[0].toUpperCase() + title.slice(1)
+  const pathname = 'https://imin-platform-api.imin.co/alpha/opportunities/search'
+  const query = {
+    activity,
+    lat, lng,
+    radius: 4,
+    source: 'static'
+  }
+  const url = urlFormat({pathname, query})
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
+    const data = await response.json()
+    res.json(data)
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 /* POST /session/book/
@@ -22,16 +41,12 @@ export const find = (req, res) => {
  * Body: title, location, datetime, facebookId
  */
 export const book = async(req, res) => {
-  const {title, location, datetime, facebookId} = req.body
-  const sessionID = await Session.findOrCreate({
-    where: { title, location, datetime }
-  }).spread(session => {
-    const {id} = session.get({ plain: true }) // eslint-disable-line no-param-reassign
-    return id
-  })
-  const userID = await findUserByFacebookID(facebookId)
+  console.log('book', req.body)
+  const {opportunityId, facebookId, datetime} = req.body
+  const userId = await findUserByFacebookID(facebookId)
+  console.log('session id', opportunityId)
   const bookedSession = await BookedSession.create({
-    session_id: sessionID, user_id: userID
+    session_id: opportunityId, user_id: userId, datetime
   }).then(session => session.get({ plain: true }))
     .catch(err => {
       return err
@@ -68,18 +83,19 @@ export const list = async(req, res) => {
         where: { user_id, session_id: id }
       }).then(details => {
         details = details.get({ plain: true })
-        return details.rating
+        return {rating: details.rating, datetime: details.datetime}
       }).catch(err => console.log(err))
-      const sessionDetails = await Session.findOne({
-        where: { id }
-      }).then(session => session.get({ plain: true }))
-      return {...sessionDetails, rating: sessionRating}
+      const sessionDetails = await fetch(`https://imin-platform-api.imin.co/alpha/opportunities/get/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Types': 'application/json',
+          'Accept': 'application/json'
+        }
+      }).then(response => response.json())
+      return {...sessionDetails, ...sessionRating}
     }
     const results = Promise.all(sessionIds.map(getSessionDetails))
-    results.then(details => {
-      console.log('details', details)
-      res.json(details)
-    }).catch(err => console.log(err))
+    results.then(details => res.json(details)).catch(err => console.log(err))
   } catch (err) {
     console.log(err)
   }
