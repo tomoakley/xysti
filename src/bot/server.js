@@ -1,6 +1,6 @@
+import {ChatConnector, UniversalBot} from 'botBuilder'
 import express from 'express'
 import config from '../config'
-import {connector} from './bot'
 
 const {
   bot: {
@@ -10,13 +10,19 @@ const {
   api: { port: apiPort }
 } = config
 
-const app = express()
-
-app.post('/api/messages', connector.listen())
-app.listen(botPort, (err) => {
-  if (err) console.error(`Server Error: ${err}`)
-  else {
-    console.info(`----\n==> ✅  Chatbot is running, talking to API server on ${apiPort}`)
-    console.info(`==> 💻  Open http://${botHost}:${botPort} in an emulator to talk to the chatbot`)
-  }
+export const connector = new ChatConnector({
+  appId: process.env.MICROSOFT_BOT_FRAMEWORK_ID,
+  appPassword: process.env.MICROSOFT_BOT_FRAMEWORK_SECRET
 })
+
+export const server = () => {
+  const app = express()
+  app.post('/api/messages', connector.listen())
+  app.listen(botPort, (err) => {
+    if (err) console.error(`Server Error: ${err}`)
+    else {
+      console.info(`----\n==> ✅  Chatbot is running, talking to API server on ${apiPort}`)
+      console.info(`==> 💻  Open http://${botHost}:${botPort} in an emulator to talk to the chatbot`)
+    }
+  })
+}

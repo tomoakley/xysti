@@ -1,27 +1,25 @@
-import builder, {ChatConnector, UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
+import builder, {UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
 import {path, isEmpty} from 'ramda'
 import 'isomorphic-fetch'
 import ApiAiRecognizer from 'api-ai-recognizer'
 import config from '../config'
 import {formatDatetime, parseDateTime, getUpcomingSessions} from 'utils/datetime'
 import geocodeLocation from 'utils/geocodeLocation'
+import {connector, server} from './server'
 
 const {
     url: apiUrl
 } = config.api
 
-export const connector = new ChatConnector({
-  appId: process.env.MICROSOFT_BOT_FRAMEWORK_ID,
-  appPassword: process.env.MICROSOFT_BOT_FRAMEWORK_SECRET
-})
-
-export const bot = new UniversalBot(connector)
+server()
 
 // set up api.ai
 const apiai = new ApiAiRecognizer(process.env.APIAI_API_KEY)
 const intents = new IntentDialog({
   recognizers: [apiai]
 })
+
+export const bot = new UniversalBot(connector)
 
 intents.onDefault(session => session.send('Sorry...can you please rephrase?')) // default response
 
