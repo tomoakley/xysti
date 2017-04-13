@@ -2,6 +2,8 @@ import builder, {UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
 import {path, isEmpty} from 'ramda'
 import 'isomorphic-fetch'
 import ApiAiRecognizer from 'api-ai-recognizer'
+import {BotAuthenticator} from 'botauth'
+import FacebookStrategy from 'passport-facebook'
 import config from '../config'
 import {formatDatetime, parseDateTime, getUpcomingSessions} from 'utils/datetime'
 import geocodeLocation from 'utils/geocodeLocation'
@@ -11,7 +13,7 @@ const {
     url: apiUrl
 } = config.api
 
-server()
+const app = server()
 
 // set up api.ai
 const apiai = new ApiAiRecognizer(process.env.APIAI_API_KEY)
@@ -19,7 +21,25 @@ const intents = new IntentDialog({
   recognizers: [apiai]
 })
 
-export const bot = new UniversalBot(connector)
+const bot = new UniversalBot(connector)
+
+const ba = new BotAuthenticator(
+    app,
+    bot,
+    { baseUrl : 'https://api.xysti.co', secret : 'botauthsecret' }
+  ).provider('facebook', (options) => {
+    console.log('options', options)
+    return new FacebookStrategy({
+        clientID: process.env.FACEBOOK_APP_ID,
+        clientSecret: process.env.FACEBOOK_APP_SECRET,
+        callbackURL: options.callbackURL
+    }, (accessToken, refreshToken, profile, done) => {
+        profile = profile || {};
+        profile.accessToken = accessToken;
+        profile.refreshToken = refreshToken;
+        return done(null, profile);
+    });
+});
 
 intents.onDefault(session => session.send('Sorry...can you please rephrase?')) // default response
 
@@ -66,7 +86,17 @@ const getEntities = (entities) => {
   return missingEntities
 }
 
-bot.dialog('/collectEntities', [
+bot.dialog("/collectEntities", [].concat(
+    ba.authenticate("facebook"),
+    function(session, results) {
+      const user = ba.profile(session, 'facebook')
+      console.log(user)
+      session.endDialog('thanks for logging in!')
+    }
+  )
+)
+
+/* bot.dialog('/collectEntities', [
   (session, args) => {
     const {missingEntities} = args
     session.dialogData.entities = args.entities
@@ -82,7 +112,7 @@ bot.dialog('/collectEntities', [
     if (missingEntities.length > 0) session.replaceDialog('/collectEntities', session.dialogData)
     else session.replaceDialog('/findSession', session.dialogData.entities)
   }
-])
+]) */
 
 intents.matches('session.query', [
   (session, args) => {

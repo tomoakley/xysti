@@ -1,5 +1,6 @@
-import {ChatConnector, UniversalBot} from 'botBuilder'
+import {ChatConnector} from 'botBuilder'
 import express from 'express'
+import bodyParser from 'body-parser'
 import config from '../config'
 
 const {
@@ -17,6 +18,8 @@ export const connector = new ChatConnector({
 
 export const server = () => {
   const app = express()
+  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(bodyParser.json())
   app.post('/api/messages', connector.listen())
   app.listen(botPort, (err) => {
     if (err) console.error(`Server Error: ${err}`)
@@ -25,4 +28,5 @@ export const server = () => {
       console.info(`==> 💻  Open http://${botHost}:${botPort} in an emulator to talk to the chatbot`)
     }
   })
+  return app
 }

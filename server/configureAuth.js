@@ -5,7 +5,7 @@ import FacebookStrategy from 'passport-facebook'
 import config from '../src/config'
 import {verifyJwt} from '../src/utils/jwt'
 import {addRefreshToken, getUserById, auth0ManagementApiJwt, addFacebookID} from './actions/User'
-
+import urlFormat from '../src/utils/urlFormat'
 
 const configureAuth = (app) => {
   const {
@@ -111,6 +111,24 @@ const configureAuth = (app) => {
   app.get('/user/link/facebook/return', passport.authenticate('facebook',
     { failureRedirect: '/loginfailed', successRedirect: '/login' }),
   )
+
+  // bot auth routes
+  app.get('/botauth/facebook', (req, res) => {
+    const pathname = 'https://www.facebook.com/v2.8/dialog/oauth'
+    const query = {
+      client_id: process.env.FACEBOOK_APP_ID,
+      redirect_uri: 'https://api.xysti.co/botauth/facebook/callback',
+      state: req.query.state,
+      scope: ['public_profile', 'email'],
+      response_type: 'token'
+    }
+    const facebookUrl = urlFormat({pathname, query})
+    res.redirect(facebookUrl)
+  })
+
+  app.get('/botauth/facebook/callback', (req, res) => {
+    res.json({req})
+  })
 }
 
 export default configureAuth
