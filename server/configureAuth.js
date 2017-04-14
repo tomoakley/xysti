@@ -112,23 +112,6 @@ const configureAuth = (app) => {
     { failureRedirect: '/loginfailed', successRedirect: '/login' }),
   )
 
-  // bot auth routes
-  app.get('/botauth/facebook', (req, res) => {
-    const pathname = 'https://www.facebook.com/v2.8/dialog/oauth'
-    const query = {
-      client_id: process.env.FACEBOOK_APP_ID,
-      redirect_uri: 'https://api.xysti.co/botauth/facebook/callback',
-      state: req.query.state,
-      scope: ['public_profile', 'email'],
-      response_type: 'token'
-    }
-    const facebookUrl = urlFormat({pathname, query})
-    res.redirect(facebookUrl)
-  })
-
-  app.get('/botauth/facebook/callback', (req, res) => {
-    res.json({req})
-  })
 }
 
 export default configureAuth

@@ -1,5 +1,6 @@
 import {ChatConnector} from 'botBuilder'
 import express from 'express'
+import session from 'express-session'
 import bodyParser from 'body-parser'
 import config from '../config'
 
@@ -18,8 +19,17 @@ export const connector = new ChatConnector({
 
 export const server = () => {
   const app = express()
+
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json())
+
+  app.use(session({
+    secret: 'botauthsecret',
+    resave: true,
+    saveUnitialized: true,
+    secure: false
+  }))
+
   app.post('/api/messages', connector.listen())
   app.listen(botPort, (err) => {
     if (err) console.error(`Server Error: ${err}`)

@@ -3,6 +3,7 @@ import {path, isEmpty} from 'ramda'
 import 'isomorphic-fetch'
 import ApiAiRecognizer from 'api-ai-recognizer'
 import {BotAuthenticator} from 'botauth'
+import passport from 'passport'
 import FacebookStrategy from 'passport-facebook'
 import config from '../config'
 import {formatDatetime, parseDateTime, getUpcomingSessions} from 'utils/datetime'
@@ -15,19 +16,17 @@ const {
 
 const app = server()
 
+app.use(passport.initialize())
+app.use(passport.session())
+app.get('/botauth/facebook', passport.authenticate('facebook'))
+app.get('/botauth/facebook/callback', passport.authenticate('facebook'))
+
 // set up api.ai
 const apiai = new ApiAiRecognizer(process.env.APIAI_API_KEY)
-const intents = new IntentDialog({
-  recognizers: [apiai]
-})
-
 const bot = new UniversalBot(connector)
 
-const ba = new BotAuthenticator(
-    app,
-    bot,
-    { baseUrl : 'https://api.xysti.co', secret : 'botauthsecret' }
-  ).provider('facebook', (options) => {
+const ba = new BotAuthenticator(app, bot, { baseUrl : 'https://4475f6b5.ngrok.io', secret : 'botauthsecret'})
+ba.provider('facebook', (options) => {
     console.log('options', options)
     return new FacebookStrategy({
         clientID: process.env.FACEBOOK_APP_ID,
@@ -37,11 +36,10 @@ const ba = new BotAuthenticator(
         profile = profile || {};
         profile.accessToken = accessToken;
         profile.refreshToken = refreshToken;
+        console.log('profile', profile)
         return done(null, profile);
     });
 });
-
-intents.onDefault(session => session.send('Sorry...can you please rephrase?')) // default response
 
 // Anytime the major version is incremented any existing conversations will be restarted.
 bot.use(builder.Middleware.dialogVersion({ version: 1.0, resetCommand: /^reset/i }));
@@ -54,7 +52,12 @@ bot.dialog('/help', [(session) => {
   session.endDialog('Global commands that are available anytime:\n\n* menu - Exits a demo and returns to the menu.\n* goodbye - End this conversation.\n* help - Displays these commands.');
 }])
 
-bot.dialog('/', intents) // pass all messages through api.ai
+const intents = new IntentDialog({ recognizers: [apiai] })
+
+bot.dialog('/', intents
+  .matches(/^profile/i, "/profile")
+  .onDefault(session => session.endDialog('Sorry...can you please rephrase?'))
+) // pass all messages through api.ai
 
 bot.on('conversationUpdate', function (message) {
     if (message.membersAdded) {
@@ -86,7 +89,7 @@ const getEntities = (entities) => {
   return missingEntities
 }
 
-bot.dialog("/collectEntities", [].concat(
+bot.dialog("/profile", [].concat(
     ba.authenticate("facebook"),
     function(session, results) {
       const user = ba.profile(session, 'facebook')
@@ -96,7 +99,7 @@ bot.dialog("/collectEntities", [].concat(
   )
 )
 
-/* bot.dialog('/collectEntities', [
+bot.dialog('/collectEntities', [
   (session, args) => {
     const {missingEntities} = args
     session.dialogData.entities = args.entities
@@ -112,7 +115,7 @@ bot.dialog("/collectEntities", [].concat(
     if (missingEntities.length > 0) session.replaceDialog('/collectEntities', session.dialogData)
     else session.replaceDialog('/findSession', session.dialogData.entities)
   }
-]) */
+])
 
 intents.matches('session.query', [
   (session, args) => {
