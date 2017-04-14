@@ -8,18 +8,13 @@ import FacebookStrategy from 'passport-facebook'
 import config from '../config'
 import {formatDatetime, parseDateTime, getUpcomingSessions} from 'utils/datetime'
 import geocodeLocation from 'utils/geocodeLocation'
-import {connector, server} from './server'
+import server, {connector} from './server'
 
 const {
     url: apiUrl
 } = config.api
 
 const app = server()
-
-app.use(passport.initialize())
-app.use(passport.session())
-app.get('/botauth/facebook', passport.authenticate('facebook'))
-app.get('/botauth/facebook/callback', passport.authenticate('facebook'))
 
 // set up api.ai
 const apiai = new ApiAiRecognizer(process.env.APIAI_API_KEY)
@@ -83,12 +78,6 @@ bot.on('conversationUpdate', function (message) {
     }
 });
 
-const getEntities = (entities) => {
-  const missingEntities = []
-  Object.keys(entities).forEach(name => !entities[name].value ? missingEntities.push(name) : null)
-  return missingEntities
-}
-
 bot.dialog("/profile", [].concat(
     ba.authenticate("facebook"),
     function(session, results) {
@@ -98,6 +87,12 @@ bot.dialog("/profile", [].concat(
     }
   )
 )
+
+const getEntities = (entities) => {
+  const missingEntities = []
+  Object.keys(entities).forEach(name => !entities[name].value ? missingEntities.push(name) : null)
+  return missingEntities
+}
 
 bot.dialog('/collectEntities', [
   (session, args) => {

@@ -183,6 +183,7 @@
     "redux-async-connect": "^1.0.0-rc2",
     "redux-form": "^3.0.12",
     "redux-thunk": "^2.1.0",
+    "restify": "^4.3.0",
     "scroll-behavior": "^0.3.2",
     "sequelize": "^3.27.0",
     "serialize-javascript": "^1.1.2",
