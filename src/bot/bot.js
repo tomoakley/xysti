@@ -9,6 +9,7 @@ import config from '../config'
 import {formatDatetime, parseDateTime, getUpcomingSessions} from 'utils/datetime'
 import geocodeLocation from 'utils/geocodeLocation'
 import server, {connector} from './server'
+import urlFormat from 'utils/urlFormat'
 
 const {
     url: apiUrl
@@ -20,7 +21,7 @@ const app = server()
 const apiai = new ApiAiRecognizer(process.env.APIAI_API_KEY)
 const bot = new UniversalBot(connector)
 
-const ba = new BotAuthenticator(app, bot, { baseUrl : 'https://4475f6b5.ngrok.io', secret : 'botauthsecret'})
+const ba = new BotAuthenticator(app, bot, { baseUrl : 'https://0e145ef7.ngrok.io', secret : 'botauthsecret'})
 ba.provider('facebook', (options) => {
     console.log('options', options)
     return new FacebookStrategy({
@@ -80,10 +81,30 @@ bot.on('conversationUpdate', function (message) {
 
 bot.dialog("/profile", [].concat(
     ba.authenticate("facebook"),
-    function(session, results) {
-      const user = ba.profile(session, 'facebook')
-      console.log(user)
-      session.endDialog('thanks for logging in!')
+    async (session, results) => {
+      const {accessToken} = ba.profile(session, 'facebook')
+      const pathname = 'https://graph.facebook.com/v2.8/me'
+      const query = {
+        redirect: 0,
+        fields: ['id', 'first_name']
+      }
+      try {
+        const response = await fetch(urlFormat({pathname, query}), {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `OAuth ${accessToken}`
+          }
+        })
+        const {id, first_name} = await response.json()
+        session.userData.id = id
+        session.userData.name = first_name
+        session.endDialog(`Hi ${first_name}, thanks for logging in!`)
+      } catch (err) {
+        console.log(err)
+        session.endDialog('something went wrong, sorry')
+      }
     }
   )
 )
@@ -135,8 +156,8 @@ bot.dialog('/findSession', [
     session.sendTyping();
     const {sport, location, date, time} = args
     const {
-      name
-    } = session.message.user
+      name, id: facebookId
+    } = session.userData
     const datetime = parseDateTime(date.value, time.value)
     const addDetailsToSession = (session, details, facebookId) => { // eslint-disable-line no-shadow
       session.dialogData.sessionDetails = {...details, facebookId}
@@ -161,7 +182,7 @@ bot.dialog('/findSession', [
       opportunities.forEach(opportunity => {
         const {title, address, website, id} = opportunity
         const buttons = [
-          builder.CardAction.postBack(addDetailsToSession(session, {opportunityId: id, datetime: datetime.from}, '10205942258634763'), 'Book this session', 'Book this session'),
+          builder.CardAction.postBack(addDetailsToSession(session, {opportunityId: id, datetime: datetime.from}, facebookId), 'Book this session', 'Book this session'),
           builder.CardAction.openUrl(session, `https://www.google.co.uk/maps?hl=en&q=${address}`, 'View on map')
         ]
         !isEmpty(website) ? buttons.push(builder.CardAction.openUrl(session, website, "Go to website")) : null
@@ -185,7 +206,7 @@ bot.dialog('/findSession', [
 bot.dialog('/bookSession', [
   (session, results) => {
     const {sessionDetails} = results
-    const {name} = session.message.user
+    const {name} = session.userData
     fetch(`${apiUrl}/session/book`, {
       method: 'POST',
       headers: {
@@ -203,7 +224,7 @@ bot.dialog('/bookSession', [
 
 intents.matches('sessions.showall', [
   async function(session, args) { // eslint-disable-line no-unused-vars, func-names
-    const {name} = session.message.user
+    const {name} = session.userData
     try {
       const userIdResponse = await fetch(`${apiUrl}/user/facebook/default-user`, {
         method: 'GET',
