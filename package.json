@@ -244,6 +244,7 @@
     "sass-loader": "^3.1.2",
     "sequelize-cli": "^2.5.1",
     "sinon": "^1.17.2",
+    "ssl-root-cas": "^1.2.3",
     "strip-loader": "^0.1.0",
     "style-loader": "^0.13.0",
     "timekeeper": "0.0.5",

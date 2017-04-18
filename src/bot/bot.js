@@ -158,11 +158,14 @@ bot.dialog('/findSession', [
     session.sendTyping();
     const {sport, location, date, time} = args
     const {
-      name, id: facebookId
-    } = session.userData
+      userData: {name, id: facebookId},
+      message: {
+        user: {name: fullName}
+      }
+    } = session
     const datetime = parseDateTime(date.value, time.value)
-    const addDetailsToSession = (session, details, facebookId) => { // eslint-disable-line no-shadow
-      session.dialogData.sessionDetails = {...details, facebookId}
+    const addDetailsToSession = (session, details) => { // eslint-disable-line no-shadow
+      session.dialogData.sessionDetails = {...details}
       return session
     }
     const geoLocation = await geocodeLocation(location.value)
@@ -184,7 +187,7 @@ bot.dialog('/findSession', [
       opportunities.forEach(opportunity => {
         const {title, address, website, id} = opportunity
         const buttons = [
-          builder.CardAction.postBack(addDetailsToSession(session, {opportunityId: id, datetime: datetime.from}, facebookId), 'Book this session', 'Book this session'),
+          builder.CardAction.postBack(addDetailsToSession(session, {opportunityId: id, datetime: datetime.from}), 'Book this session', 'Book this session'),
           builder.CardAction.openUrl(session, `https://www.google.co.uk/maps?hl=en&q=${address}`, 'View on map')
         ]
         !isEmpty(website) ? buttons.push(builder.CardAction.openUrl(session, website, "Go to website")) : null
@@ -198,7 +201,7 @@ bot.dialog('/findSession', [
       const carousel = new builder.Message(session)
         .attachmentLayout(builder.AttachmentLayout.carousel)
         .attachments(cards)
-      session.send(`I found ${opportunities.length > 1 ? 'these' : 'this'} for you, ${name}`)
+      session.send(`I found ${opportunities.length > 1 ? 'these' : 'this'} for you, ${name || fullName}`)
       builder.Prompts.text(session, carousel)
     }).catch(err => console.log(`ERROR: ${err}`))
   },
@@ -206,28 +209,30 @@ bot.dialog('/findSession', [
 ])
 
 bot.dialog('/bookSession', [
+  (session, results, next) => {
+    const {id} = session.userData
+    session.dialogData.sessionDetails = results.sessionDetails
+    if (!id) session.beginDialog('/profile', session)
+    else next()
+  },
   (session, results) => {
-    const {sessionDetails} = results
-    const {name} = session.userData
-    const runBooking = () => {
-      fetch(`${apiUrl}/session/book`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({...sessionDetails})
-      }).then(response => response.json())
-        .then(details => console.log('session', details))
-        .catch(err => console.log(`Error booking session on chatbot: ${err}`))
-      session.endDialog(`Great choice, ${name}! I have booked that session for you. Is there anything else I can help with?`)
-    }
-    if (!sessionDetails.facebookId) {
-      session.replaceDialog('/profile', session)
-      runBooking()
-    } else {
-      runBooking()
-    }
+    const {
+      userData: {name, id: facebookId},
+      dialogData: {sessionDetails}
+    } = session
+    fetch(`${apiUrl}/session/book`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({...sessionDetails, facebookId})
+    }).then(response => response.json())
+      .then(details => session.endDialog(`Great choice, ${name}! I have booked that session for you. Is there anything else I can help with?`))
+      .catch(err => {
+        session.endDialog(`Hmm, something went wrong booking your session, ${name}. Try again and if it doesn't work again, contact us at [email]. Sorry!`)
+        console.log(`Error booking session on chatbot: ${err}`)
+      })
   }
 ])
 

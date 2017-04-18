@@ -28,6 +28,6 @@ module.exports = Object.assign({
   api: {
     host: process.env.API_HOST,
     port: process.env.API_PORT,
-    url: `https://${process.env.BOT_HOST}`
+    url: `https://${process.env.API_HOST}`
   }
 }, environment);
