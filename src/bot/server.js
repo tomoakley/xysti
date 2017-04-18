@@ -1,5 +1,5 @@
 import restify from 'restify'
-import {ChatConnector} from 'botBuilder'
+import {ChatConnector} from 'botbuilder'
 import config from '../config'
 
 const {
