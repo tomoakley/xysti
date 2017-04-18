@@ -12,16 +12,18 @@ import server, {connector} from './server'
 import urlFormat from 'utils/urlFormat'
 
 const {
-    url: apiUrl
-} = config.api
+  api: {url: apiUrl},
+  bot: {url: botUrl}
+} = config
 
 const app = server()
+const bot = new UniversalBot(connector)
 
 // set up api.ai
 const apiai = new ApiAiRecognizer(process.env.APIAI_API_KEY)
-const bot = new UniversalBot(connector)
 
-const ba = new BotAuthenticator(app, bot, { baseUrl : 'https://0e145ef7.ngrok.io', secret : 'botauthsecret'})
+// set up botauth and the providers
+const ba = new BotAuthenticator(app, bot, { baseUrl: botUrl, secret: process.env.BOTAUTH_SECRET })
 ba.provider('facebook', (options) => {
     console.log('options', options)
     return new FacebookStrategy({
@@ -207,18 +209,25 @@ bot.dialog('/bookSession', [
   (session, results) => {
     const {sessionDetails} = results
     const {name} = session.userData
-    fetch(`${apiUrl}/session/book`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({...sessionDetails})
-    }).then(response => response.json())
-      .then(details => console.log('session', details))
-      .catch(err => console.log(`Error booking session on chatbot: ${err}`))
-    session.send(`Great choice, ${name}! I have booked that session for you. Is there anything else I can help with?`)
-    session.endDialog();
+    const runBooking = () => {
+      fetch(`${apiUrl}/session/book`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({...sessionDetails})
+      }).then(response => response.json())
+        .then(details => console.log('session', details))
+        .catch(err => console.log(`Error booking session on chatbot: ${err}`))
+      session.endDialog(`Great choice, ${name}! I have booked that session for you. Is there anything else I can help with?`)
+    }
+    if (!sessionDetails.facebookId) {
+      session.replaceDialog('/profile', session)
+      runBooking()
+    } else {
+      runBooking()
+    }
   }
 ])
 
