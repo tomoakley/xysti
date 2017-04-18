@@ -10,7 +10,6 @@ import {formatDatetime, parseDateTime, getUpcomingSessions} from 'utils/datetime
 import geocodeLocation from 'utils/geocodeLocation'
 import server, {connector} from './server'
 import urlFormat from 'utils/urlFormat'
-import validUrl from 'valid-url'
 
 const {
   api: {url: apiUrl},
