@@ -10,6 +10,7 @@ import {formatDatetime, parseDateTime, getUpcomingSessions} from 'utils/datetime
 import geocodeLocation from 'utils/geocodeLocation'
 import server, {connector} from './server'
 import urlFormat from 'utils/urlFormat'
+import validUrl from 'valid-url'
 
 const {
   api: {url: apiUrl},
@@ -111,6 +112,10 @@ bot.dialog("/profile", [].concat(
   )
 )
 
+bot.on("account_linking_callback", data => {
+    console.log(data);
+})
+
 const getEntities = (entities) => {
   const missingEntities = []
   Object.keys(entities).forEach(name => !entities[name].value ? missingEntities.push(name) : null)
@@ -198,11 +203,16 @@ bot.dialog('/findSession', [
           .buttons(buttons) // TODO facebookId needs to be obtained from session data
         )
       })
-      const carousel = new builder.Message(session)
-        .attachmentLayout(builder.AttachmentLayout.carousel)
-        .attachments(cards)
-      session.send(`I found ${opportunities.length > 1 ? 'these' : 'this'} for you, ${name || fullName}`)
-      builder.Prompts.text(session, carousel)
+      console.log('opportunities', opportunities)
+      if (opportunities.length > 0) {
+        const carousel = new builder.Message(session)
+          .attachmentLayout(builder.AttachmentLayout.carousel)
+          .attachments(cards)
+        session.send(`I found ${opportunities.length > 1 ? 'these' : 'this'} for you, ${name || fullName}`)
+        builder.Prompts.text(session, carousel)
+      } else {
+        session.endDialog(`Sorry ${name || fullName}, I couldn't find any ${sport.value} sessions for you. Is there anything else I can do for you?`)
+      }
     }).catch(err => console.log(`ERROR: ${err}`))
   },
   (session, args) => session.replaceDialog('/bookSession', session.dialogData) // eslint-disable-line no-unused-vars
