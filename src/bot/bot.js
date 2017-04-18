@@ -88,7 +88,7 @@ bot.dialog("/profile", [].concat(
       const pathname = 'https://graph.facebook.com/v2.8/me'
       const query = {
         redirect: 0,
-        fields: ['id', 'first_name']
+        fields: 'id,first_name,location,age_range,gender'
       }
       try {
         const response = await fetch(urlFormat({pathname, query}), {
@@ -99,10 +99,15 @@ bot.dialog("/profile", [].concat(
             'Authorization': `OAuth ${accessToken}`
           }
         })
-        const {id, first_name} = await response.json()
-        session.userData.id = id
-        session.userData.name = first_name
-        session.endDialog(`Hi ${first_name}, thanks for logging in!`)
+        const {
+          id,
+          first_name: name,
+          location: {name: defaultLocation},
+          age_range: {min: minAge},
+          gender
+        } = await response.json()
+        session.userData = {id, name, defaultLocation, minAge, gender}
+        session.endDialog(`Hi ${name}, thanks for logging in!`)
       } catch (err) {
         console.log(err)
         session.endDialog('something went wrong, sorry')
@@ -142,13 +147,14 @@ bot.dialog('/collectEntities', [
 intents.matches('session.query', [
   (session, args) => {
     session.sendTyping();
+    const {defaultLocation} = session.userData
     const sport = EntityRecognizer.findEntity(args.entities, 'sport')
     const location = EntityRecognizer.findEntity(args.entities, 'geo-city')
     const date = EntityRecognizer.findEntity(args.entities, 'date')
     const time = EntityRecognizer.findEntity(args.entities, 'time-period')
     session.dialogData.entities = {
       sport: { value: sport ? sport.entity : null, prompt: 'What sport do you want to play?' },
-      location: { value: location ? location.entity : null, prompt: 'Where did you want to do that?' },
+      location: { value: defaultLocation ? defaultLocation : location ? location.entity : null, prompt: 'Where did you want to do that?' },
       date: { value: date ? date.entity : null, prompt: 'When did you want to do that?' },
       time: { value: time ? time.entity.split('/') : null, prompt: 'What time do you want to do that?' }
     }
@@ -199,7 +205,7 @@ bot.dialog('/findSession', [
           .title(title)
           .subtitle(`Address: ${address}`)
           .text(`Date: ${formatDatetime(datetime)}`)
-          .buttons(buttons) // TODO facebookId needs to be obtained from session data
+          .buttons(buttons)
         )
       })
       console.log('opportunities', opportunities)
