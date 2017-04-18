@@ -5,7 +5,7 @@ import FacebookStrategy from 'passport-facebook'
 import config from '../src/config'
 import {verifyJwt} from '../src/utils/jwt'
 import {addRefreshToken, getUserById, auth0ManagementApiJwt, addFacebookID} from './actions/User'
-
+import urlFormat from '../src/utils/urlFormat'
 
 const configureAuth = (app) => {
   const {
@@ -111,6 +111,7 @@ const configureAuth = (app) => {
   app.get('/user/link/facebook/return', passport.authenticate('facebook',
     { failureRedirect: '/loginfailed', successRedirect: '/login' }),
   )
+
 }
 
 export default configureAuth

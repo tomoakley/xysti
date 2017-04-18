@@ -2,26 +2,42 @@ import builder, {UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
 import {path, isEmpty} from 'ramda'
 import 'isomorphic-fetch'
 import ApiAiRecognizer from 'api-ai-recognizer'
+import {BotAuthenticator} from 'botauth'
+import passport from 'passport'
+import FacebookStrategy from 'passport-facebook'
 import config from '../config'
 import {formatDatetime, parseDateTime, getUpcomingSessions} from 'utils/datetime'
 import geocodeLocation from 'utils/geocodeLocation'
-import {connector, server} from './server'
+import server, {connector} from './server'
+import urlFormat from 'utils/urlFormat'
 
 const {
-    url: apiUrl
-} = config.api
+  api: {url: apiUrl},
+  bot: {url: botUrl}
+} = config
 
-server()
+const app = server()
+const bot = new UniversalBot(connector)
 
 // set up api.ai
 const apiai = new ApiAiRecognizer(process.env.APIAI_API_KEY)
-const intents = new IntentDialog({
-  recognizers: [apiai]
-})
 
-export const bot = new UniversalBot(connector)
-
-intents.onDefault(session => session.send('Sorry...can you please rephrase?')) // default response
+// set up botauth and the providers
+const ba = new BotAuthenticator(app, bot, { baseUrl: botUrl, secret: process.env.BOTAUTH_SECRET })
+ba.provider('facebook', (options) => {
+    console.log('options', options)
+    return new FacebookStrategy({
+        clientID: process.env.FACEBOOK_APP_ID,
+        clientSecret: process.env.FACEBOOK_APP_SECRET,
+        callbackURL: options.callbackURL
+    }, (accessToken, refreshToken, profile, done) => {
+        profile = profile || {};
+        profile.accessToken = accessToken;
+        profile.refreshToken = refreshToken;
+        console.log('profile', profile)
+        return done(null, profile);
+    });
+});
 
 // Anytime the major version is incremented any existing conversations will be restarted.
 bot.use(builder.Middleware.dialogVersion({ version: 1.0, resetCommand: /^reset/i }));
@@ -34,7 +50,12 @@ bot.dialog('/help', [(session) => {
   session.endDialog('Global commands that are available anytime:\n\n* menu - Exits a demo and returns to the menu.\n* goodbye - End this conversation.\n* help - Displays these commands.');
 }])
 
-bot.dialog('/', intents) // pass all messages through api.ai
+const intents = new IntentDialog({ recognizers: [apiai] })
+
+bot.dialog('/', intents
+  .matches(/^profile/i, "/profile")
+  .onDefault(session => session.endDialog('Sorry...can you please rephrase?'))
+) // pass all messages through api.ai
 
 bot.on('conversationUpdate', function (message) {
     if (message.membersAdded) {
@@ -59,6 +80,36 @@ bot.on('conversationUpdate', function (message) {
         });
     }
 });
+
+bot.dialog("/profile", [].concat(
+    ba.authenticate("facebook"),
+    async (session, results) => {
+      const {accessToken} = ba.profile(session, 'facebook')
+      const pathname = 'https://graph.facebook.com/v2.8/me'
+      const query = {
+        redirect: 0,
+        fields: ['id', 'first_name']
+      }
+      try {
+        const response = await fetch(urlFormat({pathname, query}), {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `OAuth ${accessToken}`
+          }
+        })
+        const {id, first_name} = await response.json()
+        session.userData.id = id
+        session.userData.name = first_name
+        session.endDialog(`Hi ${first_name}, thanks for logging in!`)
+      } catch (err) {
+        console.log(err)
+        session.endDialog('something went wrong, sorry')
+      }
+    }
+  )
+)
 
 const getEntities = (entities) => {
   const missingEntities = []
@@ -107,11 +158,14 @@ bot.dialog('/findSession', [
     session.sendTyping();
     const {sport, location, date, time} = args
     const {
-      name
-    } = session.message.user
+      userData: {name, id: facebookId},
+      message: {
+        user: {name: fullName}
+      }
+    } = session
     const datetime = parseDateTime(date.value, time.value)
-    const addDetailsToSession = (session, details, facebookId) => { // eslint-disable-line no-shadow
-      session.dialogData.sessionDetails = {...details, facebookId}
+    const addDetailsToSession = (session, details) => { // eslint-disable-line no-shadow
+      session.dialogData.sessionDetails = {...details}
       return session
     }
     const geoLocation = await geocodeLocation(location.value)
@@ -133,7 +187,7 @@ bot.dialog('/findSession', [
       opportunities.forEach(opportunity => {
         const {title, address, website, id} = opportunity
         const buttons = [
-          builder.CardAction.postBack(addDetailsToSession(session, {opportunityId: id, datetime: datetime.from}, '10205942258634763'), 'Book this session', 'Book this session'),
+          builder.CardAction.postBack(addDetailsToSession(session, {opportunityId: id, datetime: datetime.from}), 'Book this session', 'Book this session'),
           builder.CardAction.openUrl(session, `https://www.google.co.uk/maps?hl=en&q=${address}`, 'View on map')
         ]
         !isEmpty(website) ? buttons.push(builder.CardAction.openUrl(session, website, "Go to website")) : null
@@ -147,7 +201,7 @@ bot.dialog('/findSession', [
       const carousel = new builder.Message(session)
         .attachmentLayout(builder.AttachmentLayout.carousel)
         .attachments(cards)
-      session.send(`I found ${opportunities.length > 1 ? 'these' : 'this'} for you, ${name}`)
+      session.send(`I found ${opportunities.length > 1 ? 'these' : 'this'} for you, ${name || fullName}`)
       builder.Prompts.text(session, carousel)
     }).catch(err => console.log(`ERROR: ${err}`))
   },
@@ -155,27 +209,36 @@ bot.dialog('/findSession', [
 ])
 
 bot.dialog('/bookSession', [
+  (session, results, next) => {
+    const {id} = session.userData
+    session.dialogData.sessionDetails = results.sessionDetails
+    if (!id) session.beginDialog('/profile', session)
+    else next()
+  },
   (session, results) => {
-    const {sessionDetails} = results
-    const {name} = session.message.user
+    const {
+      userData: {name, id: facebookId},
+      dialogData: {sessionDetails}
+    } = session
     fetch(`${apiUrl}/session/book`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({...sessionDetails})
+      body: JSON.stringify({...sessionDetails, facebookId})
     }).then(response => response.json())
-      .then(details => console.log('session', details))
-      .catch(err => console.log(`Error booking session on chatbot: ${err}`))
-    session.send(`Great choice, ${name}! I have booked that session for you. Is there anything else I can help with?`)
-    session.endDialog();
+      .then(details => session.endDialog(`Great choice, ${name}! I have booked that session for you. Is there anything else I can help with?`))
+      .catch(err => {
+        session.endDialog(`Hmm, something went wrong booking your session, ${name}. Try again and if it doesn't work again, contact us at [email]. Sorry!`)
+        console.log(`Error booking session on chatbot: ${err}`)
+      })
   }
 ])
 
 intents.matches('sessions.showall', [
   async function(session, args) { // eslint-disable-line no-unused-vars, func-names
-    const {name} = session.message.user
+    const {name} = session.userData
     try {
       const userIdResponse = await fetch(`${apiUrl}/user/facebook/default-user`, {
         method: 'GET',

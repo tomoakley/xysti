@@ -1,5 +1,5 @@
-import {ChatConnector, UniversalBot} from 'botBuilder'
-import express from 'express'
+import restify from 'restify'
+import {ChatConnector} from 'botBuilder'
 import config from '../config'
 
 const {
@@ -15,14 +15,18 @@ export const connector = new ChatConnector({
   appPassword: process.env.MICROSOFT_BOT_FRAMEWORK_SECRET
 })
 
-export const server = () => {
-  const app = express()
-  app.post('/api/messages', connector.listen())
-  app.listen(botPort, (err) => {
+export default function() {
+  const server = restify.createServer();
+  server.use(restify.bodyParser());
+  server.use(restify.queryParser());
+
+  server.post('/api/messages', connector.listen())
+  server.listen(botPort, (err) => {
     if (err) console.error(`Server Error: ${err}`)
     else {
       console.info(`----\n==> ✅  Chatbot is running, talking to API server on ${apiPort}`)
       console.info(`==> 💻  Open http://${botHost}:${botPort} in an emulator to talk to the chatbot`)
     }
   })
+  return server
 }
