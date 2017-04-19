@@ -66,7 +66,11 @@ bot.dialog('firstRun', [
     } = session
     session.userData.name = split(' ', fullName)
     session.userData.version = 1.0 // prevent re-triggering
-    session.endDialog(`Hey ${session.userData.name}, I'm Xysti. I'm your personal assistant for helping you find sports sessions and facilities. Ask me 'where can I play {sport} tomorrow afternoon in {location}' to try me out. Say 'help' for more tips and information.`)
+    session.send(`Hey ${session.userData.name[0]}, I'm Xysti. I'm your personal assistant for helping you find sports sessions and facilities. Ask me 'where can I play {sport} tomorrow afternoon in {location}' to try me out. Say 'help' for more tips and information.`)
+    if (!session.userData.id) {
+      session.send('It\'d be great if you could log in so we know who you are!')
+      session.replaceDialog('/profile', session)
+    }
 }
 ]).triggerAction({
   onFindAction: (context, callback) => {
