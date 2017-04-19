@@ -1,5 +1,5 @@
 import builder, {UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
-import {path, isEmpty} from 'ramda'
+import {path, isEmpty, split} from 'ramda'
 import 'isomorphic-fetch'
 import ApiAiRecognizer from 'api-ai-recognizer'
 import {BotAuthenticator} from 'botauth'
@@ -57,28 +57,31 @@ bot.dialog('/', intents
   .onDefault(session => session.endDialog('Sorry...can you please rephrase?'))
 ) // pass all messages through api.ai
 
-bot.on('conversationUpdate', function (message) {
-    if (message.membersAdded) {
-        message.membersAdded.forEach(function (identity) {
-            if (identity.id == message.address.bot.id) {
-               // do nothing
-            } else {
-                // User is joining conversation
-                // - For WebChat channel this will be sent when user sends first message.
-                // - When a user joins a conversation the address.user field is often for
-                //   essentially a system account so to ensure we're targeting the right
-                //   user we can tweek the address object to reference the joining user.
-                // - If we wanted to send a private message to teh joining user we could
-                //   delete the address.conversation field from the cloned address.
-                var address = Object.create(message.address);
-                address.user = identity;
-                var reply = new builder.Message()
-                        .address(address)
-                        .text(`Hey, ${identity.name}, I'm Xysti. I'm you personal assistant for helping you find sports sessions and facilities. Ask me "where can I play {sport} tomorrow afternoon in {location}" to try me out.`);
-                bot.send(reply);
-            }
-        });
-    }
+bot.dialog('firstRun', [
+  (session) => {
+    const {
+      message: {
+        user: {name: fullName}
+      }
+    } = session
+    session.userData.name = split(' ', fullName)
+    session.userData.version = 1.0 // prevent re-triggering
+    session.endDialog(`Hey ${session.userData.name}, I'm Xysti. I'm your personal assistant for helping you find sports sessions and facilities. Ask me 'where can I play {sport} tomorrow afternoon in {location}' to try me out. Say 'help' for more tips and information.`)
+}
+]).triggerAction({
+  onFindAction: (context, callback) => {
+      const {text} = context.message
+      const regex = /^Get Started/i;
+      const message = regex.test(text)
+      const ver = context.userData.version || 0
+      console.log('version', ver)
+      const score = ver < 1.0 || message ? 1.1 : 0.0
+      callback(null, score)
+  },
+  onInterrupted: function (session, dialogId, dialogArgs, next) {
+    // Prevent dialog from being interrupted.
+    session.send("Sorry... We need some information from you first.");
+  }
 });
 
 bot.dialog("/profile", [].concat(

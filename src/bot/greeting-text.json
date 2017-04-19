@@ -1,0 +1,11 @@
+{
+  "greeting": [
+    {
+      "locale":"default",
+      "text":"Hey {{user_first_name}}, I'm Xysti. I'm a personal assistant for helping you find sports sessions and facilities. Unfortunatley, I only work in the UK right now, but working hard on sowtting up my knowledge so I can be in your country soon!"
+    }, {
+      "locale":"en_GB",
+      "text":"Hey {{user_first_name}}, I'm Xysti. I'm your personal assistant for helping you find sports sessions and facilities. Ask me 'where can I play {sport} tomorrow afternoon in {location}' to try me out. Say 'help' for more tips and information."
+    }
+  ]
+}
