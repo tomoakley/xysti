@@ -66,10 +66,13 @@ bot.dialog('firstRun', [
     } = session
     session.userData.name = split(' ', fullName)
     session.userData.version = 1.0 // prevent re-triggering
-    session.send(`Hey ${session.userData.name[0]}, I'm Xysti. I'm your personal assistant for helping you find sports sessions and facilities. Ask me 'where can I play {sport} tomorrow afternoon in {location}' to try me out. Say 'help' for more tips and information.`)
+    const greeting = `Hey ${session.userData.name[0]}, I'm Xysti. I'm your personal assistant for helping you find sports sessions and facilities. Ask me 'where can I play {sport} tomorrow afternoon in {location}' to try me out. Say 'help' for more tips and information.`
     if (!session.userData.id) {
+      session.send(greeting)
       session.send('It\'d be great if you could log in so we know who you are!')
-      session.replaceDialog('/profile', session)
+      session.beginDialog('/profile', session)
+    } else {
+      session.endDialog(greeting)
     }
 }
 ]).triggerAction({
@@ -79,12 +82,14 @@ bot.dialog('firstRun', [
       const message = regex.test(text)
       const ver = context.userData.version || 0
       console.log('version', ver)
-      const score = ver < 1.0 || message ? 1.1 : 0.0
+      console.log('message equaled Get Started', message)
+      const score = (ver < 1.0) || message ? 1.1 : 0.0
+      console.log('so the score is...', score)
       callback(null, score)
   },
   onInterrupted: function (session, dialogId, dialogArgs, next) {
     // Prevent dialog from being interrupted.
-    session.send("Sorry... We need some information from you first.");
+    session.endDialog("Something's gone wrong, sorry.");
   }
 });
 
@@ -113,7 +118,7 @@ bot.dialog("/profile", [].concat(
           age_range: {min: minAge},
           gender
         } = await response.json()
-        session.userData = {id, name, defaultLocation, minAge, gender}
+        session.userData = {...session.userData, id, name, defaultLocation, minAge, gender}
         session.endDialog(`Hi ${name}, thanks for logging in!`)
       } catch (err) {
         console.log(err)
