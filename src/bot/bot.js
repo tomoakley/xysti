@@ -64,9 +64,9 @@ bot.dialog('firstRun', [
         user: {name: fullName}
       }
     } = session
-    session.userData.name = split(' ', fullName)
+    session.userData.name = split(' ', fullName)[0]
     session.userData.version = 1.0 // prevent re-triggering
-    const greeting = `Hey ${session.userData.name[0]}, I'm Xysti. I'm your personal assistant for helping you find sports sessions and facilities. Ask me 'where can I play {sport} tomorrow afternoon in {location}' to try me out. Say 'help' for more tips and information.`
+    const greeting = `Hey ${session.userData.name}, I'm Xysti. I'm your personal assistant for helping you find sports sessions and facilities. Ask me 'where can I play {sport} tomorrow afternoon in {location}' to try me out. Say 'help' for more tips and information.`
     if (!session.userData.id) {
       session.send(greeting)
       session.send('It\'d be great if you could log in so we know who you are!')
