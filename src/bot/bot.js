@@ -54,6 +54,7 @@ const intents = new IntentDialog({ recognizers: [apiai] })
 
 bot.dialog('/', intents
   .matches(/^profile/i, "/profile")
+  .matches(/^Search Sessions/i, "/SearchSessionsPostback")
   .onDefault(session => session.endDialog('Sorry...can you please rephrase?'))
 ) // pass all messages through api.ai
 
@@ -77,20 +78,14 @@ bot.dialog('firstRun', [
 }
 ]).triggerAction({
   onFindAction: (context, callback) => {
-      const {text} = context.message
-      const regex = /^Get Started/i;
-      const message = regex.test(text)
-      const ver = context.userData.version || 0
-      console.log('version', ver)
-      console.log('message equaled Get Started', message)
-      const score = (ver < 1.0) || message ? 1.1 : 0.0
-      console.log('so the score is...', score)
-      callback(null, score)
+    const {text} = context.message
+    const regex = /^Get Started/i;
+    const message = regex.test(text)
+    const ver = context.userData.version || 0
+    const score = (ver < 1.0) || message ? 1.1 : 0.0
+    callback(null, score)
   },
-  onInterrupted: function (session, dialogId, dialogArgs, next) {
-    // Prevent dialog from being interrupted.
-    session.endDialog("Something's gone wrong, sorry.");
-  }
+  onInterrupted: (session, dialogId, dialogArgs, next) => session.endDialog("Something's gone wrong, sorry.") // prevent dialog from being interrupted.
 });
 
 bot.dialog("/profile", [].concat(
@@ -128,8 +123,17 @@ bot.dialog("/profile", [].concat(
   )
 )
 
+/* Persistent Menu postbacks */
+bot.dialog('/SearchSessionsPostback', [
+  (session, args) => session.endDialog('I love helping people find new ways to be active! Ask me something like "where can I play tennis tomorrow afternoon in Hackney?" and I\'ll try and find the best options for you.')
+])
+
+bot.dialog('/BookedSessions', [
+  (session, args) => session.endDialog('What sessions do I have booked?')
+])
+
 bot.on("account_linking_callback", data => {
-    console.log(data);
+  console.log(data);
 })
 
 const getEntities = (entities) => {
