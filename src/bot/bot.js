@@ -25,7 +25,6 @@ const apiai = new ApiAiRecognizer(process.env.APIAI_API_KEY)
 // set up botauth and the providers
 const ba = new BotAuthenticator(app, bot, { baseUrl: botUrl, secret: process.env.BOTAUTH_SECRET })
 ba.provider('facebook', (options) => {
-    console.log('options', options)
     return new FacebookStrategy({
         clientID: process.env.FACEBOOK_APP_ID,
         clientSecret: process.env.FACEBOOK_APP_SECRET,
@@ -34,7 +33,6 @@ ba.provider('facebook', (options) => {
         profile = profile || {};
         profile.accessToken = accessToken;
         profile.refreshToken = refreshToken;
-        console.log('profile', profile)
         return done(null, profile);
     });
 });
@@ -224,7 +222,6 @@ bot.dialog('/findSession', [
           .buttons(buttons)
         )
       })
-      console.log('opportunities', opportunities)
       if (opportunities.length > 0) {
         const carousel = new builder.Message(session)
           .attachmentLayout(builder.AttachmentLayout.carousel)
@@ -269,9 +266,9 @@ bot.dialog('/bookSession', [
 
 intents.matches('sessions.showall', [
   async function(session, args) { // eslint-disable-line no-unused-vars, func-names
-    const {name} = session.userData
+    const {name, id: facebookId} = session.userData
     try {
-      const userIdResponse = await fetch(`${apiUrl}/user/facebook/default-user`, {
+      const userIdResponse = await fetch(`${apiUrl}/user/facebook/${facebookId}`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       })
@@ -281,30 +278,38 @@ intents.matches('sessions.showall', [
         headers: { 'Accept': 'application/json' }
       })
       const sessions = await sessionsResponse.json()
-      if (sessions && sessions.length > 0) {
-        const upcoming = getUpcomingSessions(sessions)
-        const cards = []
-        upcoming.forEach(details => {
-          const {title, location} = details
-          const datetime = formatDatetime(details.datetime)
-          cards.push(new builder.HeroCard(session)
-            .title(title)
-            .subtitle(`Location: ${location}`)
-            .text(`Date: ${datetime}`)
-          )
-        })
+      const createCarousel = () => {
+        if (sessions && sessions.length > 0) {
+          const upcoming = getUpcomingSessions(sessions)
+          if (upcoming && upcoming.length > 0) {
+            const cards = []
+            upcoming.forEach(details => {
+              const {title, address} = details
+              const datetime = formatDatetime(details.datetime)
+              cards.push(new builder.HeroCard(session)
+                .title(title)
+                .subtitle(`Address: ${address}`)
+                .text(`Date: ${datetime}`)
+              )
+            })
+            return cards
+          }
+        }
+        return false
+      }
+      const upcomingSessionCards = createCarousel()
+      if (upcomingSessionCards && upcomingSessionCards.length) {
         const msg = new builder.Message(session)
           .attachmentLayout(builder.AttachmentLayout.carousel)
-          .attachments(cards)
-        session.send(msg)
+          .attachments(upcomingSessionCards)
         session.send(`You've got these coming up soon, ${name}. Is there anything else I can help with?`)
-        session.endDialog()
+        session.endDialog(msg)
       } else {
-        session.send('Hmm, looks like you have no upcoming sessions booked right now.')
+        session.endDialog('Hmm, looks like you have no upcoming sessions booked right now.')
       }
     } catch (err) {
       console.log(err)
-      session.send('Something went wrong, sorry about that.')
+      session.endDialog('Something went wrong, sorry about that.')
     }
   }
 ])

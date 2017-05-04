@@ -68,24 +68,24 @@ export const remove = async(req, res) => {
  */
 export const list = async(req, res) => {
   const {user_id} = req.params
-  const sessionIds = await BookedSession.findAll({
+  const bookingIds = await BookedSession.findAll({
     where: { user_id }
   }).then(sessions => {
-    var session_ids = []
-    sessions.forEach(session => {
-      session_ids.push(session.session_id)
-    })
-    return session_ids
+    var ids = []
+    sessions.forEach(session => ids.push(session.id))
+    return ids
   }).catch(err => reject(err))
   try {
     const getSessionDetails = async (id) => {
+      let SESSION_ID
       const sessionRating = await BookedSession.findOne({
-        where: { user_id, session_id: id }
+        where: { user_id, id }
       }).then(details => {
-        details = details.get({ plain: true })
-        return {rating: details.rating, datetime: details.datetime}
+        const {session_id, rating, datetime} = details.get({ plain: true })
+        SESSION_ID = session_id
+        return {rating, datetime}
       }).catch(err => console.log(err))
-      const sessionDetails = await fetch(`https://imin-platform-api.imin.co/alpha/opportunities/get/${id}`, {
+      const sessionDetails = await fetch(`https://imin-platform-api.imin.co/alpha/opportunities/get/${SESSION_ID}`, {
         method: 'GET',
         headers: {
           'Content-Types': 'application/json',
@@ -94,7 +94,7 @@ export const list = async(req, res) => {
       }).then(response => response.json())
       return {...sessionDetails, ...sessionRating}
     }
-    const results = Promise.all(sessionIds.map(getSessionDetails))
+    const results = Promise.all(bookingIds.map(getSessionDetails))
     results.then(details => res.json(details)).catch(err => console.log(err))
   } catch (err) {
     console.log(err)
