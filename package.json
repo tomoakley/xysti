@@ -35,7 +35,7 @@
     "start-dev-api": "better-npm-run start-dev-api",
     "start-dev-bot": "better-npm-run start-dev-bot",
     "watch-client": "better-npm-run watch-client",
-    "dev": "cross-env NODE_ENV=development HOST=app.xysti.dev API_HOST=api.xysti.dev BOT_HOST=bot.xysti.dev concurrent --kill-others \"npm run watch-client\" \"npm run start-dev\" \"npm run start-dev-api\" \"npm run start-dev-bot\"",
+    "dev": "cross-env NODE_ENV=development concurrent --kill-others \"npm run watch-client\" \"npm run start-dev\" \"npm run start-dev-api\" \"npm run start-dev-bot\"",
     "db:migrate:create": "node_modules/.bin/sequelize migration:create",
     "db:migrate": "node_modules/.bin/sequelize db:migrate",
     "test": "node_modules/.bin/jest",

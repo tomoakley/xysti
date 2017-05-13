@@ -3,7 +3,7 @@ import session from 'express-session'
 import bodyParser from 'body-parser'
 const RedisStore = require('connect-redis')(session)
 import config from '../src/config'
-import {authorize, linkAccount, auth0ManagementApiJwt, checkAuth, facebookGetUser} from './actions/User'
+import {authorize, linkAccount, auth0ManagementApiJwt, checkAuth, facebookGetUser, signup} from './actions/User'
 import {find, book, list, remove, rate} from './actions/Session'
 import configureAuth from './configureAuth'
 
@@ -35,6 +35,7 @@ app.use((req, res, next) => {
 
 configureAuth(app)
 
+app.post('/user/signup', signup)
 app.post('/user/authorize', authorize)
 app.post('/user/link', linkAccount)
 app.get('/user/checkAuth', checkAuth)

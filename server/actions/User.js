@@ -5,6 +5,36 @@ import User from '../models/User'
 import {verifyJwt, generateJwt} from '../../src/utils/jwt'
 import urlFormat from '../../src/utils/urlFormat'
 
+/* POST signup
+ * Add a user to Auth0
+ * Params: username
+ *         password
+ */
+export const signup = async(req, res) => {
+  const {username, password} = req.body
+  const {AUTH0_CLIENT_ID, AUTH0_DOMAIN} = process.env
+  try {
+    const response = await fetch(`https://${AUTH0_DOMAIN}/dbconnections/signup`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        'client_id': AUTH0_CLIENT_ID,
+        'email': username,
+        'password': password,
+        'connection': 'Username-Password-Authentication'
+      })
+    })
+    const json = await response.json()
+    res.json(json)
+  } catch (err) {
+    console.log(`User signup error: ${err}`)
+    res.json({error: err.code})
+  }
+}
+
 /* getRefreshToken
  * Add the refresh token for the specified user into the database
  * Params: id - the main user id

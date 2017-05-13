@@ -1,21 +1,16 @@
 import React, {Component, PropTypes} from 'react'
 import 'isomorphic-fetch'
-import {Link} from 'react-router'
-import {logout} from 'utils/AuthService'
 
 export default class Login extends Component {
 
   static propTypes = {
-    user: PropTypes.object,
     config: PropTypes.object,
     fetchUserDetails: PropTypes.func,
-    removeUserDetails: PropTypes.func
   }
 
   constructor(props) {
     super(props)
     this.onLoginSubmit = this.onLoginSubmit.bind(this)
-    this.onLogoutClick = this.onLogoutClick.bind(this)
     this.email = null
     this.password = null
   }
@@ -42,29 +37,24 @@ export default class Login extends Component {
     .catch(err => console.log(`ERROR: ${err}`))
   }
 
-  onLogoutClick(event) {
-    event.preventDefault()
-    logout()
-    this.props.removeUserDetails()
-  }
-
   renderForm() {
     return (
-      <form onSubmit={this.onLoginSubmit}>
-        <input type="email" ref={el => { this._email = el }} />
-        <input type="password" ref={el => { this._password = el }} required />
-        <button type="submit">Login</button>
+      <form onSubmit={this.onSignupSubmit}>
+        <div className="form__input-group">
+          <label htmlFor="email">Email</label>
+          <input type="email" id="email" ref={el => { this._email = el }} />
+        </div>
+        <div className="form__input-group">
+          <label htmlFor="password">Password</label>
+          <input type="password" id="password" ref={el => { this._password = el }} required />
+        </div>
+        <button type="submit">Signup</button>
       </form>
     )
   }
 
-  renderLoggedInMessage() {
-    return <p>You're already logged in! You can <a href="#" onClick={this.onLogoutClick}>logout</a> if you want. Or <Link to="/profile">go to your profile</Link>.</p>
-  }
-
   render() {
-    const {user} = this.props
-    return user.id ? this.renderLoggedInMessage() : this.renderForm()
+    return this.renderForm()
   }
 
 }
