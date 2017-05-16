@@ -12,8 +12,10 @@ const app = express()
 const {
   api: {
     host: apiHost,
-    port: apiPort
-  }
+    port: apiPort,
+  },
+  bot: { url: botUrl },
+  app: { url: appUrl }
 } = config
 
 app.use(session({
@@ -26,7 +28,9 @@ app.use(session({
 app.use(bodyParser.json())
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000')
+  const ALLOWED_ORIGINS = [appUrl, botUrl]
+  const ORIGIN = req.headers.origin
+  if (ALLOWED_ORIGINS.indexOf(ORIGIN) > -1) res.header('Access-Control-Allow-Origin', ORIGIN)
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-AUTHENTICATION, X-IP, Content-Type, Accept')
   res.header('Access-Control-Allow-Credentials', true)
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')

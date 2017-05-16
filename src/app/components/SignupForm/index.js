@@ -14,6 +14,10 @@ export default class Signup extends Component {
     this.email = null
     this.password = null
     this.confirmPassword = null
+    this.state = {
+      signupConfirmed: false,
+      signupError: false
+    }
   }
 
   onSignupSubmit(event) {
@@ -22,7 +26,7 @@ export default class Signup extends Component {
     } = this.props.config.api
     console.log('apiurl', apiUrl)
     event.preventDefault()
-    if (this._password.value === this._confirmPassword) {
+    if (this._password.value === this._confirmPassword.value) {
       fetch(`${apiUrl}/user/signup`, {
         method: 'POST',
         headers: {
@@ -36,7 +40,7 @@ export default class Signup extends Component {
         credentials: 'include'
       })
       .then(response => response.json())
-      .then(data => this.props.fetchUserDetails(data))
+      .then(data => { data._id ? this.setState({ signupConfirmed: true }) : this.setState({ signupError: true }) })
       .catch(err => console.log(`ERROR: ${err}`))
     }
   }
@@ -61,7 +65,18 @@ export default class Signup extends Component {
     )
   }
 
+  renderConfirmation() {
+    return <p>Thanks for signing up! You can now log in to Xysti using the form above</p>
+  }
+
+  renderError() {
+    return <p>Hmm, something went wrong. Try again.</p>
+  }
+
   render() {
+    const {signupConfirmed, signupError} = this.state
+    if (signupConfirmed) return this.renderConfirmation()
+    if (signupError) return this.renderError()
     return this.renderForm()
   }
 
