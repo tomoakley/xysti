@@ -39,7 +39,7 @@ export default class Login extends Component {
 
   renderForm() {
     return (
-      <form onSubmit={this.onSignupSubmit}>
+      <form onSubmit={this.onLoginSubmit}>
         <div className="form__input-group">
           <label htmlFor="email">Email</label>
           <input type="email" id="email" ref={el => { this._email = el }} />
@@ -48,7 +48,7 @@ export default class Login extends Component {
           <label htmlFor="password">Password</label>
           <input type="password" id="password" ref={el => { this._password = el }} required />
         </div>
-        <button type="submit">Signup</button>
+        <button type="submit">Login</button>
       </form>
     )
   }

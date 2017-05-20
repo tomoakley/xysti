@@ -9,6 +9,7 @@ const REMOVE_USER_DETAILS_FAILURE = 'xysti/user/REMOVE_USER_DETAILS_FAILURE'
 const initialState = {
   fetchState: FETCH_STATES.INIT,
   id: null,
+  facebook_id: null,
   email: null,
   name: null,
   picture: null,
@@ -20,16 +21,18 @@ const actionHandlers = {
     return {
       fetchState: FETCH_STATES.IS_FETCHING,
       id: null,
+      facebook_id: null,
       email: null,
       name: null,
       picture: null,
       error: null
     }
   },
-  [FETCH_USER_DETAILS_SUCCESS]: function setUserDetailsSuccessActionHandler({id, email, name, picture}) {
+  [FETCH_USER_DETAILS_SUCCESS]: function setUserDetailsSuccessActionHandler({id, facebook_id, email, name, picture}) {
     return {
       fetchState: FETCH_STATES.FETCH_SUCCESSFUL,
       id,
+      facebook_id,
       email,
       name,
       picture,
@@ -40,6 +43,7 @@ const actionHandlers = {
     return {
       fetchState: FETCH_STATES.FETCH_FAILED,
       id: null,
+      facebook_id: null,
       email: null,
       name: null,
       picture: null,
@@ -51,6 +55,7 @@ const actionHandlers = {
     return {
       fetchState: FETCH_STATES.FETCH_INIT,
       id: null,
+      facebook_id: null,
       email: null,
       name: null,
       picture: null,
@@ -76,10 +81,11 @@ function requestUserDetails() {
   }
 }
 
-export function receiveUserDetailsSuccess({id, email, name, picture}) {
+export function receiveUserDetailsSuccess({id, facebook_id, email, name, picture}) {
   return {
     type: FETCH_USER_DETAILS_SUCCESS,
     id,
+    facebook_id,
     email,
     name,
     picture,

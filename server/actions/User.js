@@ -113,6 +113,7 @@ export const login = async (username, password) => {
     const {id_token, refresh_token} = data
     return verifyJwt(id_token, (jwtErr, decoded) => {
       if (jwtErr) return jwtErr
+      console.log('decoded user data', decoded)
       const {sub: user_id, email: emailAddress, picture, name, exp, iat, aud} = decoded
       addRefreshToken(user_id, refresh_token)
       return generateJwt({user_id, exp, iat, aud}, AUTH0_SECRET, true, (err, token) => {

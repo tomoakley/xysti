@@ -40,7 +40,7 @@ export default class Signup extends Component {
         credentials: 'include'
       })
       .then(response => response.json())
-      .then(data => { data._id ? this.setState({ signupConfirmed: true }) : this.setState({ signupError: true }) })
+      .then(data => data._id ? this.setState({ signupConfirmed: true }) : this.setState({ signupError: true }))
       .catch(err => console.log(`ERROR: ${err}`))
     }
   }

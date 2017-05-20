@@ -38,9 +38,13 @@ const configureAuth = (app) => {
       const {id_token, refresh_token} = data
       return verifyJwt(id_token, (jwtErr, decoded) => {
         if (jwtErr) return jwtErr
-        const {sub: id, email, picture, name} = decoded
+        const {
+          sub: id, email, picture,
+          identities: [ , { user_id: facebook_id, profileData: { given_name, family_name } } ]
+        } = decoded
+        let name = given_name || family_name ? [given_name, family_name] : [email]
         addRefreshToken(id, refresh_token)
-        return done(null, {id, email, picture, name})
+        return done(null, {id, facebook_id, email, picture, name})
       })
     } catch (err) {
       console.log(`FETCH ERROR: ${err}`)
