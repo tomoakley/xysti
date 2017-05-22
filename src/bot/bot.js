@@ -1,5 +1,6 @@
 import builder, {UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
-import {path, isEmpty, split} from 'ramda'
+import path from 'path'
+import {path as rPath, isEmpty, split} from 'ramda'
 import 'isomorphic-fetch'
 import ApiAiRecognizer from 'api-ai-recognizer'
 import {BotAuthenticator} from 'botauth'
@@ -17,7 +18,7 @@ const {
 } = config
 
 const app = server()
-const bot = new UniversalBot(connector)
+const bot = new UniversalBot(connector, { localizerSettings: { botLocalePath: path.join(__dirname, "./locale"), defaultLocale: "en" } })
 
 // set up api.ai
 const apiai = new ApiAiRecognizer(process.env.APIAI_API_KEY)
@@ -69,6 +70,7 @@ bot.dialog('firstRun', [
     if (!session.userData.id) {
       session.send(greeting)
       session.send('It\'d be great if you could log in so we know who you are!')
+      session.send('NOTE: You need to have signed up at https://app.xysti.co/login and then go to https://app.xysti.co/profile and connect your account to Facebook, BEFORE logging in here. Soon this will all be automatic!')
       session.beginDialog('/profile', session)
     } else {
       session.endDialog(greeting)
@@ -112,7 +114,9 @@ bot.dialog("/profile", [].concat(
           gender
         } = await response.json()
         session.userData = {...session.userData, id, name, defaultLocation, minAge, gender}
-        session.endDialog(`Hi ${name}, thanks for logging in!`)
+        const XYSTI_ID_RESPONSE = await fetch(`${apiUrl}/user/facebook/${id}`, { method: 'GET' })
+        const {userId: XYSTI_ID} = await XYSTI_ID_RESPONSE.json()
+        XYSTI_ID ? session.endDialog(`Hi ${name}, thanks for logging in!`) : session.endDialog(`Hmm, ${name}. Looks like you haven't signed up to Xysti yet.`)
       } catch (err) {
         console.log(err)
         session.endDialog('something went wrong, sorry')
@@ -193,7 +197,7 @@ bot.dialog('/findSession', [
       return session
     }
     const geoLocation = await geocodeLocation(location.value)
-    const {lat, lng} = path(['results', 0, 'geometry', 'location'], geoLocation)
+    const {lat, lng} = rPath(['results', 0, 'geometry', 'location'], geoLocation)
     fetch(`${apiUrl}/session/find`, {
       method: 'POST',
       headers: {

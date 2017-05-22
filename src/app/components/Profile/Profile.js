@@ -9,16 +9,21 @@ export default class ProfilePage extends Component {
   }
 
   render() {
-    const {user} = this.props
     const {
-      url: apiUrl
-    } = this.props.config.api
+      user: { name, facebook_id }
+    } = this.props
+    const { url: apiUrl } = this.props.config.api
     return (
-      <p>
-        Hi, {user.email}.
+      <div className="page--content">
+        <h1>Hi, {name ? name[0] : null}!</h1>
+        { !facebook_id ?
+          <p>
+            To use Xysti, you need to connect your account to Facebook:
+            <a className="btn--xysti" href={`${apiUrl}/user/link/facebook`}>Connect to facebook</a>
+          </p>
+        : null }
         <button onClick={this.props.logout}>Logout?</button>
-        <a href={`${apiUrl}/user/link/facebook`}>Connect to facebook</a>
-      </p>
+      </div>
     )
   }
 

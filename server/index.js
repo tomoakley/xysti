@@ -3,7 +3,7 @@ import session from 'express-session'
 import bodyParser from 'body-parser'
 const RedisStore = require('connect-redis')(session)
 import config from '../src/config'
-import {authorize, linkAccount, auth0ManagementApiJwt, checkAuth, facebookGetUser} from './actions/User'
+import {authorize, linkAccount, auth0ManagementApiJwt, checkAuth, facebookGetUser, signup} from './actions/User'
 import {find, book, list, remove, rate} from './actions/Session'
 import configureAuth from './configureAuth'
 
@@ -12,8 +12,10 @@ const app = express()
 const {
   api: {
     host: apiHost,
-    port: apiPort
-  }
+    port: apiPort,
+  },
+  bot: { url: botUrl },
+  app: { url: appUrl }
 } = config
 
 app.use(session({
@@ -26,7 +28,9 @@ app.use(session({
 app.use(bodyParser.json())
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000')
+  const ALLOWED_ORIGINS = [appUrl, botUrl]
+  const ORIGIN = req.headers.origin
+  if (ALLOWED_ORIGINS.indexOf(ORIGIN) > -1) res.header('Access-Control-Allow-Origin', ORIGIN)
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-AUTHENTICATION, X-IP, Content-Type, Accept')
   res.header('Access-Control-Allow-Credentials', true)
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
@@ -35,6 +39,7 @@ app.use((req, res, next) => {
 
 configureAuth(app)
 
+app.post('/user/signup', signup)
 app.post('/user/authorize', authorize)
 app.post('/user/link', linkAccount)
 app.get('/user/checkAuth', checkAuth)

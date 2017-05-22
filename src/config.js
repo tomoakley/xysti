@@ -12,22 +12,24 @@ const environment = {
   }
 }[process.env.NODE_ENV || 'development'];
 
+const DOMAIN_TLD = environment === 'production' ? 'co' : 'dev'
+
 module.exports = Object.assign({
   app: {
-    host: process.env.HOST,
+    host: `app.xysti.${DOMAIN_TLD}`,
     port: process.env.PORT,
-    url: `https://${process.env.HOST}`,
+    url: `https://app.xysti.${DOMAIN_TLD}`,
     title: 'Xysti',
     description: 'On-demand sports and physical activity app'
   },
   bot: {
-    host: process.env.BOT_HOST,
+    host: `bot.xysti.${DOMAIN_TLD}`,
     port: process.env.BOT_PORT,
-    url: `https://${process.env.BOT_HOST}`
+    url: `https://bot.xysti.${DOMAIN_TLD}`
   },
   api: {
-    host: process.env.API_HOST,
+    host: `api.xysti.${DOMAIN_TLD}`,
     port: process.env.API_PORT,
-    url: `https://${process.env.API_HOST}`
+    url: `https://api.xysti.${DOMAIN_TLD}`
   }
 }, environment);

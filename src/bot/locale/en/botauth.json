@@ -1,0 +1,5 @@
+{
+    "connect_prompt" : "Connect to Facebook. You can say 'cancel' to go back without signing in.",
+    "cancelled" : "Cancelling Facebook authentication...",
+    "connect_button" : "Log in with Facebook"
+}

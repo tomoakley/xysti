@@ -19,7 +19,7 @@ export default class Header extends Component {
     return (
       <Link to="/profile" styleName="headerUser">
         <img src={picture} styleName="headerUser__picture" alt={`${name} picture`} />
-        <strong>Hi, {name}</strong>
+        <strong>Hi, {name ? name[0] : null}</strong>
       </Link>
     )
   }

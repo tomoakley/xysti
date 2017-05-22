@@ -5,8 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var webpack = require('webpack');
 var assetsPath = path.resolve(__dirname, '../static/dist');
-var host = (process.env.HOST || 'localhost');
-var port = (+process.env.PORT + 1) || 3001;
+var host = 'webpack.xysti.dev';
 
 require('dotenv').config();
 const NODE_ENV = process.env.NODE_ENV
@@ -69,7 +68,7 @@ module.exports = {
   context: path.resolve(__dirname, '..'),
   entry: {
     'main': [
-      'webpack-hot-middleware/client?path=http://' + host + ':' + port + '/__webpack_hmr',
+      'webpack-hot-middleware/client?path=https://' + host + '/__webpack_hmr',
       './src/app/client.js'
     ]
   },
@@ -77,7 +76,7 @@ module.exports = {
     path: assetsPath,
     filename: '[name]-[hash].js',
     chunkFilename: '[name]-[chunkhash].js',
-    publicPath: 'http://' + host + ':' + port + '/dist/'
+    publicPath: 'https://' + host + '/dist/'
   },
   module: {
     loaders: [
@@ -119,7 +118,7 @@ module.exports = {
       },
       __CLIENT__: true,
       __SERVER__: false,
-      __DEVELOPMENT__: false,
+      __DEVELOPMENT__: true,
       __DEVTOOLS__: true
     }),
     new webpack.IgnorePlugin(/^mock-firmata$/),
