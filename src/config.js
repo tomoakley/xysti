@@ -12,7 +12,7 @@ const environment = {
   }
 }[process.env.NODE_ENV || 'development'];
 
-const DOMAIN_TLD = environment === 'production' ? 'co' : 'dev'
+const DOMAIN_TLD = process.env.NODE_ENV === 'development' ? 'dev' : 'co'
 
 module.exports = Object.assign({
   app: {

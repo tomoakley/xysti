@@ -30,6 +30,7 @@ app.use(bodyParser.json())
 app.use((req, res, next) => {
   const ALLOWED_ORIGINS = [appUrl, botUrl]
   const ORIGIN = req.headers.origin
+  console.log(ALLOWED_ORIGINS, ORIGIN)
   if (ALLOWED_ORIGINS.indexOf(ORIGIN) > -1) res.header('Access-Control-Allow-Origin', ORIGIN)
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-AUTHENTICATION, X-IP, Content-Type, Accept')
   res.header('Access-Control-Allow-Credentials', true)

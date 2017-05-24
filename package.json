@@ -24,11 +24,11 @@
   ],
   "main": "bin/client.js",
   "scripts": {
-    "start": "concurrent --kill-others \"npm run start-prod\" \"npm run start-prod-api\" \"npm run start-prod-bot\"",
+    "start": "NODE_ENV=production concurrent --kill-others \"npm run start-prod\" \"npm run start-prod-api\" \"npm run start-prod-bot\"",
     "start-prod": "better-npm-run start-prod",
     "start-prod-api": "better-npm-run start-prod-api",
     "start-prod-bot": "better-npm-run start-prod-bot",
-    "build": "NODE_ENV=production HOST=app.xysti.co API_HOST=api.xysti.co BOT_HOST=bot.xysti.co better-npm-run build",
+    "build": "NODE_ENV=production better-npm-run build",
     "postinstall": "npm run build",
     "lint": "eslint -c .eslintrc src server",
     "start-dev": "better-npm-run start-dev",
