@@ -13,6 +13,7 @@ import urlFormat from '../../src/utils/urlFormat'
  */
 export const find = async (req, res) => {
   const {title, lat, lng} = req.body
+  console.log(title, lat, lng)
   const activity = title[0].toUpperCase() + title.slice(1)
   const pathname = 'https://imin-platform-api.imin.co/alpha/opportunities/search'
   const query = {

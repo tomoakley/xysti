@@ -138,19 +138,12 @@ bot.on("account_linking_callback", data => {
   console.log(data);
 })
 
-const getEntities = (entities) => {
-  const missingEntities = []
-  Object.keys(entities).forEach(name => !entities[name].value ? missingEntities.push(name) : null)
-  return missingEntities
-}
-
 bot.dialog('/collectEntities', [
   (session, args) => {
-    const {missingEntities} = args
-    session.dialogData.entities = args.entities
+    const {missingEntities, entities} = args
     session.dialogData.missingEntities = missingEntities
-    if (missingEntities.length > 0) builder.Prompts.text(session, args.entities[missingEntities[0]].prompt)
-    else session.replaceDialog('/findSession', session.dialogData.entities)
+    session.dialogData.entities = entities
+    builder.Prompts.text(session, entities[missingEntities[0]].prompt)
   },
   (session, results) => {
     const {missingEntities} = session.dialogData
@@ -158,7 +151,7 @@ bot.dialog('/collectEntities', [
     session.dialogData.entities[missingEntity].value = results.response
     session.dialogData.missingEntities = missingEntities
     if (missingEntities.length > 0) session.replaceDialog('/collectEntities', session.dialogData)
-    else session.replaceDialog('/findSession', session.dialogData.entities)
+    else session.replaceDialog('/findSession', session.dialogData)
   }
 ])
 
@@ -166,6 +159,11 @@ intents.matches('session.query', [
   (session, args) => {
     session.sendTyping();
     const {defaultLocation} = session.userData
+    const getEntities = (entities) => {
+      const missingEntities = []
+      Object.keys(entities).forEach(name => !entities[name].value ? missingEntities.push(name) : null)
+      return missingEntities
+    }
     const sport = EntityRecognizer.findEntity(args.entities, 'sport')
     const location = EntityRecognizer.findEntity(args.entities, 'geo-city')
     const date = EntityRecognizer.findEntity(args.entities, 'date')
@@ -176,41 +174,46 @@ intents.matches('session.query', [
       date: { value: date ? date.entity : null, prompt: 'When did you want to do that?' },
       time: { value: time ? time.entity.split('/') : null, prompt: 'What time do you want to do that?' }
     }
-    session.dialogData.missingEntities = getEntities(session.dialogData.entities)
-    session.replaceDialog('/collectEntities', session.dialogData)
+    const MISSING_ENTITIES = getEntities(session.dialogData.entities)
+    if (MISSING_ENTITIES.length > 0) {
+      session.dialogData.missingEntities = MISSING_ENTITIES
+      session.replaceDialog('/collectEntities', session.dialogData)
+    } else {
+      session.replaceDialog('/findSession', session.dialogData)
+    }
   }
 ])
 
 bot.dialog('/findSession', [
   async (session, args) => {
     session.sendTyping();
-    const {sport, location, date, time} = args
+    const {sport, location, date, time} = args.entities
     const {
       userData: {name, id: facebookId},
       message: {
         user: {name: fullName}
       }
     } = session
-    const datetime = parseDateTime(date.value, time.value)
     const addDetailsToSession = (session, details) => { // eslint-disable-line no-shadow
       session.dialogData.sessionDetails = {...details}
       return session
     }
-    const geoLocation = await geocodeLocation(location.value)
-    const {lat, lng} = rPath(['results', 0, 'geometry', 'location'], geoLocation)
-    fetch(`${apiUrl}/session/find`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        title: sport.value,
-        lat, lng,
+    try {
+      const datetime = parseDateTime(date.value, time.value)
+      const {lat, lng} = rPath(['results', 0, 'geometry', 'location'], await geocodeLocation(location.value))
+      const findSessionResponse = await fetch(`${apiUrl}/session/find`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Origin': 'https://bot.xysti.dev'
+        },
+        body: JSON.stringify({
+          title: sport.value,
+          lat, lng,
+        })
       })
-    }).then(response => response.json())
-    .then(data => {
-      const {opportunities} = data
+      const {opportunities} = await findSessionResponse.json()
       const cards = []
       opportunities.forEach(opportunity => {
         const {title, address, website, id} = opportunity
@@ -235,7 +238,9 @@ bot.dialog('/findSession', [
       } else {
         session.endDialog(`Sorry ${name || fullName}, I couldn't find any ${sport.value} sessions for you. Is there anything else I can do for you?`)
       }
-    }).catch(err => console.log(`ERROR: ${err}`))
+    } catch (err) {
+      console.log(`ERROR: ${err}`)
+    }
   },
   (session, args) => session.replaceDialog('/bookSession', session.dialogData) // eslint-disable-line no-unused-vars
 ])
