@@ -1,4 +1,4 @@
-import builder, {UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
+import builder, {Middleware, UniversalBot, IntentDialog, EntityRecognizer} from 'botbuilder'
 import path from 'path'
 import {path as rPath, isEmpty, split} from 'ramda'
 import 'isomorphic-fetch'
@@ -39,7 +39,7 @@ ba.provider('facebook', (options) => {
 });
 
 // Anytime the major version is incremented any existing conversations will be restarted.
-bot.use(builder.Middleware.dialogVersion({ version: 1.0, resetCommand: /^reset/i }));
+bot.use(Middleware.dialogVersion({ version: 1.0, resetCommand: /^reset/i }));
 
 // Global Actions
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
