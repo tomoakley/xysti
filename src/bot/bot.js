@@ -206,7 +206,7 @@ bot.dialog('/findSession', [
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Origin': 'https://bot.xysti.dev'
+          'Origin': botUrl
         },
         body: JSON.stringify({
           title: sport.value,
@@ -261,7 +261,8 @@ bot.dialog('/bookSession', [
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Origin': botUrl
       },
       body: JSON.stringify({...sessionDetails, facebookId})
     }).then(response => response.json())
@@ -279,7 +280,10 @@ intents.matches('sessions.showall', [
     try {
       const userIdResponse = await fetch(`${apiUrl}/user/facebook/${facebookId}`, {
         method: 'GET',
-        headers: { 'Accept': 'application/json' }
+        headers: {
+          'Accept': 'application/json',
+          'Origin': botUrl
+        }
       })
       const {userId} = await userIdResponse.json()
       const sessionsResponse = await fetch(`${apiUrl}/sessions/list/${userId}`, {
